@@ -34,8 +34,8 @@ When on a laptop reviewing previous exercises, a user would be using grid (brows
   +$  timestamp  @
   +$  activity-type  ?(%bike %walk %run)
   +$  distance-unit  ?(%mile %km)
-  +$  settings  [units=distance-unit]
-  +$  location  [=lattitude =longitude =timestamp]
+  +$  settings  [unit=distance-unit]
+  +$  location  [=timestamp lattitude=@sd longitude=@sd altitude=@sd heading=@sd ]
   +$  activity  [=id segments=(list segment) total-distance=@ud total-elapsed-time=@ud]
   +$  activity-summary  [=id total-distance=@ud total-elapsed-time=@ud]
   +$  segment  [start-time=timestamp end-time=timestamp path=(list location) distance=@ud elapsed-time=@ud]
@@ -45,7 +45,7 @@ When on a laptop reviewing previous exercises, a user would be using grid (brows
         [%stop-activity =id path=(list location)]
         [%end-activity =id path=(list location)]
         [%delete-activity =id]
-        [%save-settings =settings]
+        [%save-settings unit=distance-unit]
         [%save-locations =id path=(list location)]
     ==
   +$  update
