@@ -11,9 +11,21 @@
       altitude=@rs
       heading=@rs
   ==
-+$  activity  [=id =activity-type segments=(list segment) total-distance=@rs total-elapsed-time=@rs]
++$  activity
+  $:  =id
+      =activity-type
+      segments=(list segment)
+      total-distance=@rs
+      total-elapsed-time=@rs
+  ==
 +$  activity-summary  [=id total-distance=@rs total-elapsed-time=@rs]
-+$  segment  [start-time=timestamp end-time=timestamp path=(list location) distance=@rs elapsed-time=@rs]
++$  segment
+  $:  start-time=timestamp
+      end-time=(unit timestamp)
+      path=(list location)
+      distance=@rs
+      elapsed-time=@rs
+  ==
 +$  activities  ((mop id activity) gth)
 +$  action
   $%  [%start-activity =id =activity-type]

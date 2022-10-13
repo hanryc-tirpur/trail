@@ -46,7 +46,13 @@
       =/  new-activity  :*
         id.act
         activity-type.act
-        *(list segment)
+        :~  :*
+          id.act
+          *(unit timestamp)
+          *(list location)
+          .0
+          .0
+        ==  ==
         .0
         .0
       ==
