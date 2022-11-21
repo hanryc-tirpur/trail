@@ -1,39 +1,37 @@
+/-  *geo, *measurement
+
 |%
 +$  id  @
-+$  timestamp  @
 +$  activity-type  ?(%bike %walk %run)
-+$  distance-unit  ?(%mile %km)
 +$  settings  [unit=distance-unit]
-+$  location
++$  timestamp  @
++$  location-reading
   $:  =timestamp
-      lattitude=@rs
-      longitude=@rs
-      altitude=@rs
-      heading=@rs
+      =location
   ==
 +$  activity
   $:  =id
       =activity-type
       segments=(list segment)
-      total-distance=@rs
-      total-elapsed-time=@rs
+      total-distance=@rd
+      total-elapsed-time=@rd
   ==
-+$  activity-summary  [=id total-distance=@rs total-elapsed-time=@rs]
++$  activity-summary  [=id total-distance=@rd total-elapsed-time=@rd]
 +$  segment
   $:  start-time=timestamp
       end-time=(unit timestamp)
-      path=(list location)
-      distance=@rs
-      elapsed-time=@rs
+      path=(list location-reading)
+      distance=@rd
+      elapsed-time=@rd
   ==
 +$  activities  ((mop id activity) gth)
 +$  action
-  $%  [%start-activity =id =activity-type]
-      :: [%stop-activity =id path=(list location)]
-      :: [%end-activity =id path=(list location)]
+  $%  [%sync-activity =id =activity-type full-path=(list (list location-reading))]
+      :: [%stop-activity =id path=(list location-reading)]
+      :: [%end-activity =id path=(list location-reading)]
       :: [%delete-activity =id]
       [%save-settings unit=distance-unit]
-      :: [%save-locations =id path=(list location)]
+      :: [%save-locations =id path=(list location-reading)]
   ==
 +$  update
   $%  [%activities list=(list activity-summary)]

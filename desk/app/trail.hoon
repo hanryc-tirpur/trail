@@ -6,6 +6,7 @@
     ==
 +$  state-0  [%0 =settings =activities]
 +$  card  card:agent:gall
+++  activities-accessor  ((on id activity) gth)
 --
 %-  agent:dbug
 =|  state-0
@@ -42,22 +43,16 @@
     ?-    -.act
         %save-settings
       state(settings [unit.act])
-        %start-activity
-      =/  new-activity  :*
+        %sync-activity
+      ?<  (has:activities-accessor activities id.act)
+      =/  to-add  :*
         id.act
         activity-type.act
-        :~  :*
-          id.act
-          *(unit timestamp)
-          *(list location)
-          .0
-          .0
-        ==  ==
+        *(list section)
         .0
         .0
       ==
-      =/  updated  (~(put by activities) id.act `activity`new-activity)
-      state(activities updated)
+      state(activities (put:activities-accessor activities id.act `activity`to-add))
     ==
   --
 ::
