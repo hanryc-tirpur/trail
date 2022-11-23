@@ -1,5 +1,5 @@
 /-  *trail
-/+  default-agent, dbug, agentio
+/+  default-agent, dbug, agentio, geo
 |%
 +$  versioned-state
     $%  state-0
@@ -7,6 +7,8 @@
 +$  state-0  [%0 =settings =activities]
 +$  card  card:agent:gall
 ++  activities-accessor  ((on id activity) gth)
+++  to-km  ~(calculate-distance geo %km)
+++  to-miles  ~(calculate-distance geo %mile)
 --
 %-  agent:dbug
 =|  state-0
@@ -45,15 +47,47 @@
       state(settings [unit.act])
         %sync-activity
       ?<  (has:activities-accessor activities id.act)
+      ?~  full-path.act  !!
+      ~&  (to-segment i.full-path.act)
+      =/  segments=(list segment)  `(list segment)`(turn full-path.act to-segment)
       =/  to-add  :*
         id.act
         activity-type.act
-        *(list section)
-        .0
-        .0
+        segments
+        .~0
+        .~0
       ==
-      state(activities (put:activities-accessor activities id.act `activity`to-add))
+      :: state(activities (put:activities-accessor activities id.act `activity`to-add))
+      state
     ==
+    ++  to-segment
+      |=  readings=(list location-reading)
+      ^-  segment
+      ?~  readings  !!
+      =/  prev  i.readings
+      =/  remaining  t.readings
+      =/  seg=segment  :*
+        timestamp.prev
+        timestamp.prev
+        `(list location-reading)`~[prev]
+        [.~0 %km]
+        .~0
+      ==
+      |-
+      ?~  remaining  seg
+      =/  current  i.remaining
+      =/  updated=segment  :*
+        start-time.seg
+        timestamp.current
+        (snoc path.seg current)
+        [(add:rd val.distance.seg val:(to-km location.prev location.current)) unit.distance.seg]
+        (sub timestamp.current start-time.seg)
+      ==
+      %=  $
+        seg  updated
+        remaining  t.remaining
+        prev  current
+      ==
   --
 ::
 ++  on-watch  on-watch:def

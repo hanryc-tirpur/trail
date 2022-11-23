@@ -19,10 +19,10 @@
 +$  activity-summary  [=id total-distance=@rd total-elapsed-time=@rd]
 +$  segment
   $:  start-time=timestamp
-      end-time=(unit timestamp)
+      end-time=timestamp
       path=(list location-reading)
-      distance=@rd
-      elapsed-time=@rd
+      =distance
+      elapsed-time=@
   ==
 +$  activities  ((mop id activity) gth)
 +$  action
