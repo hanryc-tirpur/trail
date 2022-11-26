@@ -49,14 +49,15 @@
       ?<  (has:activities-accessor activities id.act)
       ?~  full-path.act  !!
       ~&  (to-segment i.full-path.act)
-      =/  segments=(list segment)  `(list segment)`(turn full-path.act to-segment)
+      =/  segments=(list segment)  (turn full-path.act to-segment)
       =/  to-add  :*
         id.act
         activity-type.act
         segments
         .~0
-        .~0
+        (reel segments |=([s=segment sum=@] (add sum elapsed-time.s)))
       ==
+      ~&  to-add
       :: state(activities (put:activities-accessor activities id.act `activity`to-add))
       state
     ==
@@ -71,7 +72,7 @@
         timestamp.prev
         `(list location-reading)`~[prev]
         [.~0 %km]
-        .~0
+        0
       ==
       |-
       ?~  remaining  seg

@@ -23,6 +23,9 @@
   ::  c = -1.2845906244690837
   ::  d =  0.295624144969963174
   ::  acos(x) ≈ π/2 + (ax + bx³) / (1 + cx² + dx⁴)
+  ::
+  ::  https://opensource.apple.com/source/Libm/Libm-315/Source/Intel/acos.c
+  ::
   |=  x=@rd  ^-  @rd
   =/  a  .~-0.939115566365855
   =/  b  .~0.9217841528914573

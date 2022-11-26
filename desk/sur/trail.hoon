@@ -13,8 +13,8 @@
   $:  =id
       =activity-type
       segments=(list segment)
-      total-distance=@rd
-      total-elapsed-time=@rd
+      total-distance=distance
+      total-elapsed-time=@
   ==
 +$  activity-summary  [=id total-distance=@rd total-elapsed-time=@rd]
 +$  segment
