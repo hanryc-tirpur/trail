@@ -1,5 +1,5 @@
 /-  *trail
-/+  default-agent, dbug, agentio, geo
+/+  default-agent, dbug, agentio, geo, measurement
 |%
 +$  versioned-state
     $%  state-0
@@ -7,6 +7,7 @@
 +$  state-0  [%0 =settings =activities]
 +$  card  card:agent:gall
 ++  activities-accessor  ((on id activity) gth)
+++  add-km  ~(add-distance measurement %km)
 ++  to-km  ~(calculate-distance geo %km)
 ++  to-miles  ~(calculate-distance geo %mile)
 --
@@ -54,7 +55,7 @@
         id.act
         activity-type.act
         segments
-        .~0
+        (reel segments |=([s=segment sum=distance] (add-km sum distance.s)))
         (reel segments |=([s=segment sum=@] (add sum elapsed-time.s)))
       ==
       ~&  to-add
@@ -81,7 +82,7 @@
         start-time.seg
         timestamp.current
         (snoc path.seg current)
-        [(add:rd val.distance.seg val:(to-km location.prev location.current)) unit.distance.seg]
+        (add-km distance.seg (to-km location.prev location.current))
         (sub timestamp.current start-time.seg)
       ==
       %=  $
