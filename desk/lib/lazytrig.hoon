@@ -1,8 +1,9 @@
 ::  Transcendental functions library for Hoon, compatible with @rd
-=/  tau  .~6.28318530717
-=/  pi   .~3.14159265358
-=/  e    .~2.718281828
-=/  rtol  .~1e-5
+=/  tau       .~6.28318530717
+=/  pi        .~3.1415926535897932
+=/  half-pi   (div:rd pi .~2)
+=/  e         .~2.718281828
+=/  rtol       .~1e-5
 |%
 ++  factorial
   |=  x=@rd  ^-  @rd
@@ -16,27 +17,6 @@
   ?:  (gth:rd x .~0)
     x
   (sub:rd .~0 x)
-++  acos
-  ::  https://stackoverflow.com/questions/3380628/fast-arc-cos-algorithm
-  ::  a = -0.939115566365855
-  ::  b =  0.9217841528914573
-  ::  c = -1.2845906244690837
-  ::  d =  0.295624144969963174
-  ::  acos(x) ≈ π/2 + (ax + bx³) / (1 + cx² + dx⁴)
-  ::
-  ::  https://opensource.apple.com/source/Libm/Libm-315/Source/Intel/acos.c
-  ::
-  |=  x=@rd  ^-  @rd
-  =/  a  .~-0.939115566365855
-  =/  b  .~0.9217841528914573
-  =/  c  .~-1.2845906244690837
-  =/  d  .~0.295624144969963174
-  %-  add:rd  :-
-    (div:rd pi .~2)
-  %-  div:rd  :-  
-    (add:rd (mul:rd a x) (mul:rd b (pow-n x .~3)))
-  (add:rd .~1 (add:rd (mul:rd c (pow-n x .~2)) (mul:rd d (pow-n x .~4))))
-
 ++  exp
   |=  x=@rd  ^-  @rd
   =/  rtol  .~1e-5
@@ -128,4 +108,133 @@
 ++  to-rad
   |=  deg=@rd  ^-  @rd
   (mul:rd (div:rd deg .~180.00) pi)
+++  acos
+  ::
+  ::  https://opensource.apple.com/source/Libm/Libm-315/Source/Intel/acos.c
+  ::
+  |=  x=@rd  ^-  @rd
+  ?:  (lth .~-0.4 x)
+    ?:  (lth .~-0.6 x) 
+      (n-tail x)
+    (gap x)
+  ?:  (lte x .~0.4)
+    (center x)
+  ?:  (lte x .~0.6) 
+    (gap x)
+  (p-tail x)
+++  center
+  |=  x=@rd  ^-  @rd
+  ~&  ['called center' x]
+  =/  p03  .~0.166666666666625133184818
+  =/  p05  .~0.7500000000967090522908427e-1
+  =/  p07  .~0.4464285630020156622713320e-1
+  =/  p09  .~0.3038198238851575770651788e-1
+  =/  p11  .~0.2237115216935265224962544e-1
+  =/  p13  .~0.1736953298172084894468665e-1
+  =/  p15  .~0.1378527665685754961528021e-1
+  =/  p17  .~0.1277870997666947910124296e-1
+  =/  p19  .~0.4673473145155259234911049e-2
+  =/  p21  .~0.1951350766744288383625404e-1
+  =/  x-squared  (mul:rd x x)
+  =/  poly  %+  mul:rd  x-squared
+    %+  add:rd  p03  %+  mul:rd  x-squared
+    %+  add:rd  p05  %+  mul:rd  x-squared
+    %+  add:rd  p07  %+  mul:rd  x-squared
+    %+  add:rd  p09  %+  mul:rd  x-squared
+    %+  add:rd  p11  %+  mul:rd  x-squared
+    %+  add:rd  p13  %+  mul:rd  x-squared
+    %+  add:rd  p15  %+  mul:rd  x-squared
+    %+  add:rd  p17  %+  mul:rd  x-squared
+    %+  add:rd  p19  (mul:rd x-squared p21)
+  =/  diff  (add:rd x (mul:rd poly x))
+  (sub:rd half-pi diff)
+++  gap
+  |=  x=@rd  ^-  @rd
+  ~&  ['called gap' x]
+  =/  p03  .~0.1666666544260252354339083
+  =/  p05  .~0.7500058936188719422797382e-1
+  =/  p07  .~0.4462999611462664666589096e-1
+  =/  p09  .~0.3054999576148835435598555e-1
+  =/  p11  .~0.2090953485621966528477317e-1
+  =/  p13  .~0.2626916834046217573905021e-1
+  =/  p15  .~-0.2496419961469848084029243e-1
+  =/  p17  .~0.1336320190979444903198404
+  =/  p19  .~-0.2609082745402891409913617
+  =/  p21  .~0.4154485118940996442799104
+  =/  p23  .~-0.3718481677216955169129325
+  =/  p25  .~0.1791132167840254903934055
+  =/  x-squared  (mul:rd x x)
+  =/  poly  %+  mul:rd  x-squared
+    %+  add:rd  p03  %+  mul:rd  x-squared
+    %+  add:rd  p05  %+  mul:rd  x-squared
+    %+  add:rd  p07  %+  mul:rd  x-squared
+    %+  add:rd  p09  %+  mul:rd  x-squared
+    %+  add:rd  p11  %+  mul:rd  x-squared
+    %+  add:rd  p13  %+  mul:rd  x-squared
+    %+  add:rd  p15  %+  mul:rd  x-squared
+    %+  add:rd  p17  %+  mul:rd  x-squared
+    %+  add:rd  p19  %+  mul:rd  x-squared
+    %+  add:rd  p21  %+  mul:rd  x-squared
+    %+  add:rd  p23  (mul:rd x-squared p25)
+  =/  diff  (mul:rd poly x)
+  (sub:rd half-pi (add:rd diff x))
+++  n-tail
+  |=  x=@rd  ^-  @rd
+  ~&  ['called n-tail' x]
+  =/  p00  .~1.5707956513160834076561054
+  =/  p01  .~0.2145907003920708442108238
+  =/  p02  .~0.8896369437915166409934895e-1
+  =/  p03  .~0.5039488847935731213671556e-1
+  =/  p04  .~0.3239698582040400391437898e-1
+  =/  p05  .~0.2133501549935443220662813e-1
+  =/  p06  .~0.1317423797769298396461497e-1
+  =/  p07  .~0.7016307696008088925432394e-2
+  =/  p08  .~0.2972670140131377611481662e-2
+  =/  p09  .~0.9157019394367251664320071e-3
+  =/  p10  .~0.1796407754831532447333023e-3
+  =/  p11  .~0.1670402962434266380655447e-4
+  ?:  (lth .~-1 x)  !!
+    ?.  (gth .~-1 x)  pi
+  =/  poly  %+  mul:rd  (sqt:rd (add:rd .~1 x))
+    %+  add:rd  p00  %+  mul:rd  x
+    %+  add:rd  p01  %+  mul:rd  x
+    %+  add:rd  p02  %+  mul:rd  x
+    %+  add:rd  p03  %+  mul:rd  x
+    %+  add:rd  p04  %+  mul:rd  x
+    %+  add:rd  p05  %+  mul:rd  x
+    %+  add:rd  p06  %+  mul:rd  x
+    %+  add:rd  p07  %+  mul:rd  x
+    %+  add:rd  p08  %+  mul:rd  x
+    %+  add:rd  p09  %+  mul:rd  x
+    %+  add:rd  p10  (mul:rd x p11)
+  (sub:rd pi poly)
+++  p-tail
+  |=  x=@rd  ^-  @rd
+  ~&  ['called p-tail' x]
+  =/  p00  .~1.5707956046853235350824205
+  =/  p01  .~-0.2145900291823555067724496
+  =/  p02  .~0.8895931658903454714161991e-1
+  =/  p03  .~-0.5037781062999805015401690e-1
+  =/  p04  .~0.3235271184788013959507217e-1
+  =/  p05  .~-0.2125492340970560944012545e-1
+  =/  p06  .~0.1307107321829037349021838e-1
+  =/  p07  .~-0.6921689208385164161272068e-2
+  =/  p08  .~0.2912114685670939037614086e-2
+  =/  p09  .~-0.8899459104279910976564839e-3
+  =/  p10  .~0.1730883544880830573920551e-3
+  =/  p11  .~-0.1594866672026418356538789e-4
+  ?:  (gth x .~1)  !!
+    ?.  (lth x .~1)  .~0
+  =/  t0  %+  mul:rd  x
+    %+  add:rd  p01  %+  mul:rd  x
+    %+  add:rd  p02  %+  mul:rd  x
+    %+  add:rd  p03  %+  mul:rd  x
+    %+  add:rd  p04  %+  mul:rd  x
+    %+  add:rd  p05  %+  mul:rd  x
+    %+  add:rd  p06  %+  mul:rd  x
+    %+  add:rd  p07  %+  mul:rd  x
+    %+  add:rd  p08  %+  mul:rd  x
+    %+  add:rd  p09  %+  mul:rd  x
+    %+  add:rd  p10  (mul:rd x p11)
+  (mul:rd (sqt:rd (sub:rd .~1 x)) (add:rd t0 p00))
 --

@@ -1,16 +1,13 @@
 /-  *measurement
-/+  *test, measurement
+/+  *test, *lazytrig, measurement
 |%
 ++  to-km  ~(add-distance measurement %km)
 ++  to-miles  ~(add-distance measurement %mile)
 ++  expect-tol-eq
   |=  [a=distance b=distance]
   =/  tol  .~0.000005
-  =/  abs  ?:  (gth:rd val.a val.b)
-    (sub:rd val.a val.b)
-  (sub:rd val.b val.a)
   %-  expect
-    !>  (lth:rd abs tol)
+    !>  (lth:rd (absolute (sub:rd val.b val.a)) tol)
 ++  test-adding-two-distances-with-same-units
   ;:  weld
   %+  expect-tol-eq
