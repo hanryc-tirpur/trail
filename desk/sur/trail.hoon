@@ -16,7 +16,7 @@
       total-distance=distance
       total-elapsed-time=@
   ==
-+$  activity-summary  [=id total-distance=@rd total-elapsed-time=@rd]
++$  activity-summary  [=id total-distance=distance total-elapsed-time=@]
 +$  segment
   $:  start-time=timestamp
       end-time=timestamp

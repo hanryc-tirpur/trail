@@ -59,8 +59,7 @@
         (reel segments |=([s=segment sum=@] (add sum elapsed-time.s)))
       ==
       ~&  to-add
-      :: state(activities (put:activities-accessor activities id.act `activity`to-add))
-      state
+      state(activities (put:activities-accessor activities id.act `activity`to-add))
     ==
     ++  to-segment
       |=  readings=(list location-reading)
@@ -92,6 +91,41 @@
       ==
   --
 ::
+++  on-peek
+  |=  =path
+  ^-  (unit (unit cage))
+  ?>  (team:title our.bowl src.bowl)
+  =/  now=@  (unm:chrono:userlib now.bowl)
+  ~&  path
+  ?+    path  (on-peek:def path)
+      [%x %activities *]
+    ?+    t.t.path  (on-peek:def path)
+        [%all ~]
+      =/  matches=(list [@ activity])  (tap:activities-accessor activities)
+      :^  ~  ~  %trail-update
+      !>  ^-  update
+      [%activities (turn matches |=(a=[@ activity] [id.a total-distance.a total-elapsed-time.a]))]
+    ::
+        [%before @ @ ~]
+      =/  before=@  (rash i.t.t.t.path dem)
+      =/  max=@  (rash i.t.t.t.t.path dem)
+      =/  matches=(list [@ activity])  (tab:activities-accessor activities `before max)
+      :^  ~  ~  %trail-update
+      !>  ^-  update
+      [%activities (turn matches |=(a=[@ activity] [id.a total-distance.a total-elapsed-time.a]))]
+    ::
+        [%between @ @ ~]
+      =/  start=@
+        =+  (rash i.t.t.t.path dem)
+        ?:(=(0 -) - (sub - 1))
+      =/  end=@  (add 1 (rash i.t.t.t.t.path dem))
+      =/  matches=(list [@ activity])  (tap:activities-accessor (lot:activities-accessor activities `end `start))
+      :^  ~  ~  %trail-update
+      !>  ^-  update
+      [%activities (turn matches |=(a=[@ activity] [id.a total-distance.a total-elapsed-time.a]))]
+    ==
+  ==
+::
 ++  on-watch  on-watch:def
 
   :: |=  =path
@@ -103,7 +137,6 @@
 ::
 ++  on-leave  on-leave:def
 ++  on-agent  on-agent:def
-++  on-peek   on-peek:def
 ++  on-arvo   on-arvo:def
 ++  on-fail   on-fail:def
 --

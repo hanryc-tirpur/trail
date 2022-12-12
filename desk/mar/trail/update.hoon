@@ -1,12 +1,12 @@
 /-  *trail
-|_  act=action
+|_  upd=update
 ++  grow
   |%
-  ++  noun  act
+  ++  noun  upd
   --
 ++  grab
   |%
-  ++  noun  action
+  ++  noun  update
   --
 ++  grad  %noun
 --
