@@ -96,7 +96,6 @@
   ^-  (unit (unit cage))
   ?>  (team:title our.bowl src.bowl)
   =/  now=@  (unm:chrono:userlib now.bowl)
-  ~&  path
   ?+    path  (on-peek:def path)
       [%x %activities *]
     ?+    t.t.path  (on-peek:def path)

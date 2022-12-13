@@ -32,6 +32,15 @@ Your browser may require CORS requests to be enabled for the use of `@urbit/http
 ~your-sig:dojo>
 ```
 
+=trail -build-file /=trail=/sur/trail/hoon
+=a [`@`555 [[.~28.419411 %deg] [.~-81.5494 %deg]]]
+=b [`@`655 [[.~28.3753 %deg] [.~-81.5494 %deg]]]
+:trail &trail-action [%sync-activity `@`900.000 %bike `(list (list location-reading:trail))`~[~[a b]]]
+
+.^(update:trail %gx /=trail=/activities/all/noun)
+.^(update:trail %gx /=trail=/activities/before/100/8/noun)
+.^(update:trail %gx /=trail=/activities/between/10/99/noun)
+
 Regardless of what you run to develop, Vite will hot-reload code changes as you work so you don't have to constantly refresh.
 
 ### Deploying
