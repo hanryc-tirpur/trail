@@ -1,8 +1,10 @@
 /-  *trail
+/+  *trail-json
 |_  upd=update
 ++  grow
   |%
   ++  noun  upd
+  ++  json  (enjs-update upd)
   --
 ++  grab
   |%

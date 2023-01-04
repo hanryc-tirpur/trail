@@ -5,6 +5,10 @@ module.exports = {
   theme: {
     extend: {}
   },
+  corePlugins: {
+    // Remove Tailwind CSS's preflight style so it can use the MUI's preflight instead (CssBaseline).
+    preflight: false,
+  },
   screens: {},
   variants: {
     extend: {}
