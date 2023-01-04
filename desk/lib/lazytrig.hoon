@@ -17,6 +17,32 @@
   ?:  (gth:rd x .~0)
     x
   (sub:rd .~0 x)
+++  floor
+  |=  x=@rd  ^-  @ud
+  ?:  =(x .~0.0)  0
+  =/  floor=@ud  0
+  =/  floor-rd=@rd  .~1.0
+  |-  
+  :: ~&  [%floor floor floor-rd]
+  ?:  (gth:rd floor-rd x)  floor
+  $(floor +(floor), floor-rd (add:rd floor-rd .~1))
+++  floor-remainder
+  |=  x=@rd  ^-  @rd
+  ?:  =(x .~0.0)  .~0.0
+  =/  floor=@rd  .~0.0
+  =/  floor-rd=@rd  .~1.0
+  |-  
+  :: ~&  [%floor-remainder floor floor-rd]
+  ?:  (gth floor-rd x)  (sub:rd x floor)
+  $(floor (add:rd floor .~1), floor-rd (add:rd floor-rd .~1))
+++  round
+  |=  x=@rd  ^-  @ud
+  =/  num  (floor x)
+  =/  rem  (floor-remainder x)
+  =/  next-digit  (floor (mul:rd rem .~10))
+  :: ~&  [%round num rem next-digit]
+  ?:  (lth next-digit 5)  num
+  +(num)
 ++  exp
   |=  x=@rd  ^-  @rd
   =/  rtol  .~1e-5

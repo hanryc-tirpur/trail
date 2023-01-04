@@ -22,7 +22,7 @@
     ]
   }
   '''
-  =/  summary-1=activity-summary  [123.456 [.~1.456 %mile] 45.678]
+  =/  summary-1=activity-summary  [123.456 [.~4.945564642162535 %mile] 45.678]
   ;:  weld
   %+  expect-eq
     !>  (skip (trip expected-json) remove-whitespace)

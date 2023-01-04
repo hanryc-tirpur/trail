@@ -60,4 +60,70 @@
     .~1.04719755
     (acos .~0.5)
   ==
+++  test-floor-zero
+  ;:  weld
+  %+  expect-eq
+    !>  0
+    !>  (floor .~0.0)
+  ==
+++  test-floor-less-than-one
+  ;:  weld
+  %+  expect-eq
+    !>  0
+    !>  (floor .~0.435)
+  ==
+++  test-floor-greater-than-one
+  ;:  weld
+  %+  expect-eq
+    !>  8
+    !>  (floor .~8.175)
+  ==
+++  test-floor-large-number
+  ;:  weld
+  %+  expect-eq
+    !>  23.458
+    !>  (floor .~23458.175)
+  ==
+++  test-floor-remainder-less-than-one
+  ;:  weld
+  %+  expect-eq
+    !>  .~0.435
+    !>  (floor-remainder .~0.435)
+  ==
+++  test-floor-remainder-greater-than-one
+  ;:  weld
+  %+  expect-tol-eq
+    .~0.175
+    (floor-remainder .~8.175)
+  ==
+++  test-floor-remainder-large-number
+  ;:  weld
+    %+  expect-tol-eq
+    .~0.175
+    (floor-remainder .~23458.175)
+  ==
+++  test-round-zero
+  ;:  weld
+  %+  expect-eq
+    !>  0
+    !>  (round .~0)
+  ==
+++  test-round-single-digit
+  ;:  weld
+  %+  expect-eq
+    !>  3
+    !>  (round .~3)
+  ==
+++  test-round-up
+  ;:  weld
+  %+  expect-eq
+    !>  4
+    !>  (round .~3.78)
+  ==
+++  test-round-down
+  ;:  weld
+  %+  expect-eq
+    !>  4
+    !>  (round .~4.43)
+  ==
 --
