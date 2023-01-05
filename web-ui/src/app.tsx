@@ -18,7 +18,7 @@ api.ship = window.ship;
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiaGFucnljLXRpcnB1ciIsImEiOiJjbGM5ODJpbTQwa3JpM3FwOGg1ZWJxZzFoIn0.aTFy6FZ_UD6Djp3QBZG6aw'
 
-function RecipeReviewCard() {
+function RecipeReviewCard({ id, totalElapsedTime, totalDistance }: ActivitySummary) {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const map = useRef<Map | null>(null);
   const [lng, setLng] = useState(-70.9);
@@ -63,7 +63,7 @@ function RecipeReviewCard() {
             <MoreVertIcon />
           </IconButton>
         }
-        title="Shrimp and Chorizo Paella"
+        title={totalElapsedTime}
         subheader="September 14, 2016"
       />
       <div>
@@ -80,17 +80,45 @@ function RecipeReviewCard() {
   );
 }
 
+export declare type ChargeUpdate = ChargeUpdateInitial | ChargeUpdateAdd | ChargeUpdateDel;
+export interface ActivitySummariesInitial {
+  activities: ActivitySummary[];
+}
+export interface ChargeUpdateAdd {
+    'add-charge': {
+        desk: string;
+        charge: ActivitySummary;
+    };
+}
+export interface ChargeUpdateDel {
+    'del-charge': string;
+}
 
+enum DistanceUnit {
+  Mile = 'mile',
+  KM = 'km',
+}
+
+type Distance = {
+  val: number,
+  unit: DistanceUnit,
+}
+
+type ActivitySummary = {
+  id: string,
+  totalElapsedTime: number,
+  totalDistance: Distance,
+}
 
 export function App() {
   const scryAllActivities: Scry = { app: 'trail', path: '/activities/all', }
-  const [apps, setApps] = useState<Charges>();
+  const [summaries, setSummaries] = useState<ActivitySummary[]>();
 
   useEffect(() => {
     async function init() {
-      const activities = (await api.scry<ChargeUpdateInitial>(scryAllActivities));
-      console.log('All activities', activities)
-      setApps(activities.initial);
+      const summariesResponse = (await api.scry<ActivitySummariesInitial>(scryAllActivities));
+      console.log('All activities', summariesResponse)
+      setSummaries(summariesResponse.activities);
     }
 
     init();
@@ -101,9 +129,13 @@ export function App() {
       <div className="max-w-md space-y-6 py-20">
         <h1 className="text-3xl font-bold">Welcome to trail</h1>
         <ul className="space-y-4">
-          <li key={'wutwut'} className="flex items-center space-x-3 text-sm leading-tight">
-            <RecipeReviewCard />
-          </li>
+          {summaries && summaries.map(s => {
+            return (
+              <li key={s.id} className="flex items-center space-x-3 text-sm leading-tight">
+                <RecipeReviewCard {... s} />
+              </li>
+            )
+          })}
         </ul>
       </div>
     </main>
