@@ -15,7 +15,7 @@
         "totalElapsedTime": 45678,
         "id": 123456,
         "totalDistance": {
-          "val": 1.456,
+          "val": 4.9455646421625,
           "unit": "mile"
         }
       }
