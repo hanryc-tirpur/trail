@@ -1,6 +1,12 @@
 /-  *trail, *measurement
 /+  *lazytrig
 |%
+++  u-to-tape
+  |=  a=@u
+  ?:  =(0 a)  "0"
+  %-  flop
+  |-  ^-  ^tape
+  ?:(=(0 a) ~ [(add '0' (mod a 10)) $(a (div a 10))])
 ++  enjs-update
   =,  enjs:format
   |=  upd=update
@@ -59,10 +65,7 @@
     (lte:rd (absolute (sub:rd .~1 a)) tol)
   ++  u-to-cord
     |=  a=@u
-    ?:  =(0 a)  '0'
-    %-  crip
-    %-  flop
-    |-  ^-  ^tape
-    ?:(=(0 a) ~ [(add '0' (mod a 10)) $(a (div a 10))])
+    (crip (u-to-tape a))
+
   --
 --

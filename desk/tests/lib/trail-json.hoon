@@ -28,4 +28,10 @@
     !>  (skip (trip expected-json) remove-whitespace)
     !>  (en-json:html (enjs-update [%activities `(list activity-summary)`~[summary-1]]))
   ==
+++  test-u-to-tape
+  ;:  weld
+  %+  expect-eq
+    !>  "1234567"
+    !>  (u-to-tape 1.234.567)
+  ==
 --

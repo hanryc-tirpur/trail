@@ -2,7 +2,7 @@
 
 |%
 +$  id  @
-+$  activity-type  ?(%bike %walk %run)
++$  activity-type  ?(%bike %walk %run %ride)
 +$  settings  [unit=distance-unit]
 +$  timestamp  @
 +$  location-reading

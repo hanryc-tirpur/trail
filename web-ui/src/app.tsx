@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Urbit from '@urbit/http-api';
 import { Charges, ChargeUpdateInitial, scryCharges, Scry } from '@urbit/api'
 import mapboxgl, { Map } from 'mapbox-gl'
+import polyline from '@mapbox/polyline'
 import { AppTile } from './components/AppTile';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
@@ -21,9 +22,9 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiaGFucnljLXRpcnB1ciIsImEiOiJjbGM5ODJpbTQwa3JpM
 function RecipeReviewCard({ id, totalElapsedTime, totalDistance }: ActivitySummary) {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const map = useRef<Map | null>(null);
-  const [lng, setLng] = useState(-70.9);
-  const [lat, setLat] = useState(42.35);
-  const [zoom, setZoom] = useState(9);
+  const [lng, setLng] = useState(-88.01478);
+  const [lat, setLat] = useState(41.97843);
+  const [zoom, setZoom] = useState(12);
 
   useEffect(() => {
     if (map.current) return; // initialize map only once
@@ -48,6 +49,33 @@ function RecipeReviewCard({ id, totalElapsedTime, totalDistance }: ActivitySumma
         setZoom(Number(map.current.getZoom().toFixed(2)))
       }
     });
+
+    map.current.on('load', () => {
+      if (map.current === null) return
+
+      // @ts-ignore Bad types
+      map.current.addSource('route', {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          properties: {},
+          geometry: polyline.toGeoJSON('e|e_GjkexOn@Jj@RP^LrMBfA@nAEZAXAlE@PDFJB\\?r@ChIEpADzDEH@HDd@^LDxA@v@ZXE\\QNEjG@RJBN@RAhDIjBqAvMqDja@w@zHyCv_@oA`NoAtKQrAMf@uDf\\a@|Cy@nFoAvHaBdJM^IHM@iG@yHE}IMgHAaTYy@G]Gw@Ws@c@q@o@UYU]cBaDKe@mC}EuAuByA_B_Au@QQiCwAm@Q{@S_C[wAEaG@}bA]iGBMBIFGJEPAzF?NCJIFIBMA]MgA_AWK}@CwAAOE_@[UBGGAQDa@HAJDDt@Qv@SRE@C?CKHDHcB@FAMAB@OFIDB@GXL?HIX@HJRTPLFN@zAAl@F\\Rj@f@^RZHd@CFGDMDg@?eAIyB'),
+        }
+      })
+      map.current.addLayer({
+        'id': 'route',
+        'type': 'line',
+        'source': 'route',
+        'layout': {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        'paint': {
+          'line-color': '#888',
+          'line-width': 8
+        }
+      });
+    })
   })
 
   return (
@@ -116,7 +144,17 @@ export function App() {
 
   useEffect(() => {
     async function init() {
-      const summariesResponse = (await api.scry<ActivitySummariesInitial>(scryAllActivities));
+      let summariesResponse = (await api.scry<ActivitySummariesInitial>(scryAllActivities));
+      summariesResponse = summariesResponse.activities?.length ? summariesResponse : {
+        activities: [{
+          id: '23456',
+          totalElapsedTime: 787,
+          totalDistance: {
+            val: 8.2110,
+            unit: DistanceUnit.KM,
+          }
+        }]
+      }
       console.log('All activities', summariesResponse)
       setSummaries(summariesResponse.activities);
     }
