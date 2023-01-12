@@ -26,16 +26,33 @@
     ==
   ==
   ++  entry
-    |=  a=activity-summary
+    |=  a=activity
     ^-  json
-    %-  pairs
-    :~  ['id' (numb id.a)]
-        ['totalElapsedTime' (numb total-elapsed-time.a)]
-        :-  'totalDistance'
-        %-  pairs
-        :~  ['val' (numb-rd val.total-distance.a)]
-            ['unit' s+unit.total-distance.a]
-    ==  ==
+    ?-    -.a
+        %standard
+      %-  pairs
+      :~  ['id' (numb id.a)]
+          ['totalElapsedTime' (numb total-elapsed-time.a)]
+          :-  'totalDistance'
+          %-  pairs
+          :~  ['val' (numb-rd val.total-distance.a)]
+              ['unit' s+unit.total-distance.a]
+      ==  ==
+        %strava
+      %-  pairs
+      :~  ['id' (numb id.a)]
+          ['activityType' s+activity-type.a]
+          ['name' (tape name.a)]
+          ['timeMoving' (numb time-moving.a)]
+          ['timeElapsed' (numb time-elapsed.a)]
+          ['mapPolyline' (tape map-polyline.a)]
+          ['strava-activity-id' (numb strava-activity-id.a)]
+          :-  'totalDistance'
+          %-  pairs
+          :~  ['val' (numb-rd val.total-distance.a)]
+              ['unit' s+unit.total-distance.a]
+      ==  ==
+    ==
   ++  numb-rd
     |=  a=@rd
     ^-  json
