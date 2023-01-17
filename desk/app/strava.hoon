@@ -51,7 +51,7 @@
   |^
   ?>  (team:title our.bowl src.bowl)
   ?.  ?=(%strava-action mark)  (on-poke:def mark vase)
-  =/  act  !<(action vase)
+  =/  act  !<(strava-action vase)
   ?-    -.act
       %save-connection-info
     =/  tid  `@ta`(cat 3 'thread_' (scot %uv (sham eny.bowl)))
@@ -67,20 +67,32 @@
       [%pass /thread/[ta-now] %agent [our.bowl %spider] %watch /thread-result/[tid]]
       [%pass /thread/[ta-now] %agent [our.bowl %spider] %poke %spider-start !>(start-args)]
     ==
+    ::
+      %sync-activity
+    =/  tid  `@ta`(cat 3 'thread_' (scot %uv (sham eny.bowl)))
+    =/  ta-now  `@ta`(scot %da now.bowl)
+    =/  req-args  :*
+        (get-activity-summary-url 'wut')
+        access-token.auth.state
+      ==
+    =/  start-args  [~ `tid byk.bowl(r da+now.bowl) %strava-sync-activity !>(req-args)]
+    :_  this
+    :~
+      [%pass /thread/[ta-now] %agent [our.bowl %spider] %watch /thread-result/[tid]]
+      [%pass /thread/[ta-now] %agent [our.bowl %spider] %poke %spider-start !>(start-args)]
+    ==
   ==
   :: ~&  act
   :: =.  state  (poke-action act)
   :: `this
   ::
     ++  poke-action
-      |=  act=action
+      |=  act=strava-action
       ^-  _state
       ?-    -.act
           %save-connection-info
-        =/  new-args=connection-args  :*
-            client-id.act
-            client-secret.act
-          ==
+        state
+          %sync-activity
         state
       ==
     ++  get-initial-auth-url
@@ -91,6 +103,11 @@
       =.  ret-url  (weld ret-url "&client_secret={(trip client-secret)}")
       =.  ret-url  (weld ret-url "&code={(trip strava-code)}")
       =.  ret-url  (weld ret-url "&grant_type=authorization_code")
+      ret-url
+    ++  get-activity-summary-url
+      |=  wut=@t
+      =/  ret-url  (weld api-base.urls.state "athlete/activities")
+      =.  ret-url  (weld ret-url "?per_page=10")
       ret-url
   --
 ::
@@ -118,6 +135,7 @@
 ++  on-agent
   |=  [=wire =sign:agent:gall]
   ^-  (quip card _this)
+  |^
   ?+    -.wire  (on-agent:def wire sign)
       %thread
     ?+    -.sign  (on-agent:def wire sign)
@@ -140,10 +158,32 @@
         ?-    -.res
             %initial-authorization-response
           `this(state state(is-connected %.y, auth auth.res, con-args [client-id.res client-secret.res]))
+            %sync-activity-response
+          =/  cards  (turn activities.res to-card)
+          :_  this
+          cards
         ==
       ==
     ==
   ==
+    ++  to-card
+      |=  act=activity-summary
+      ^-  card
+      =/  hmm  :*
+        %save-outside-activity
+        :*
+          %strava
+          `@`id.act
+          activity-type.act
+          name.act
+          [(div:rd total-distance-m.act .~1000) %km]
+          `@`time-moving-s.act
+          `@`time-elapsed-s.act
+          map-polyline.act
+          strava-activity-id.act
+        ==  ==
+      [%pass /strava/add/activity %agent [our.bowl %trail] %poke %trail-action !>(hmm)]
+  --
 ::
 ++  on-watch  on-watch:def
 ++  on-leave  on-leave:def
@@ -157,14 +197,12 @@
   a
 ::
 ++  poke-strava-action
-  |=  act=action
+  |=  act=strava-action
   ^-  _state
   ?-    -.act
       %save-connection-info
-    =/  new-args=connection-args  :*
-        client-id.act
-        client-secret.act
-      ==
-    state(con-args new-args)
+    state
+      %sync-activity
+    state
   ==
 --

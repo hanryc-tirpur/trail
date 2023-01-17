@@ -1,6 +1,11 @@
 /-  *strava, trail
 /+  *text-processing
 |%
+++  dejs-activities
+  =,  dejs:format
+  |=  jon=json
+  ^-  (list activity-summary)
+  ((ar dejs-activity) jon)
 ++  dejs-activity
   =,  dejs:format
   |=  jon=json
