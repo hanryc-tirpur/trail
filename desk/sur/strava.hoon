@@ -32,6 +32,7 @@
   ==
 +$  thread-response
   $%  [%initial-authorization-response auth=refresh-response:oauth2 client-id=@ud client-secret=@t]
+      [%refresh-authorization-response auth=refresh-response:oauth2]
       [%sync-activity-response activities=(list activity-summary)]
   ==
 --
