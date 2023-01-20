@@ -10,6 +10,7 @@
       con-args=connection-args
       auth=refresh-response:oauth2
       urls=api-urls
+      sync-status=api-sync-status
   ==
 +$  card  card:agent:gall
 --
@@ -34,7 +35,7 @@
       oauth-base
       ~
     ==
-  =.  state  state(is-connected %.n)
+  =.  state  state(is-connected %.n, sync-status [%unsynced ''])
   `this
 ++  on-save
   ^-  vase
@@ -53,69 +54,87 @@
   ?.  ?=(%strava-action mark)  (on-poke:def mark vase)
   =/  act  !<(strava-action vase)
   ?-    -.act
+      %sync-all  !!
       %save-connection-info
-    =/  tid  `@ta`(cat 3 'thread_' (scot %uv (sham eny.bowl)))
-    =/  ta-now  `@ta`(scot %da now.bowl)
-    =/  req-args  :*
-        (get-initial-auth-url +.act)
-        client-id.act
-        client-secret.act
-      ==
-    =/  start-args  [~ `tid byk.bowl(r da+now.bowl) %strava-initial-authorization !>(req-args)]
-    :_  this
-    :~
-      [%pass /thread/[ta-now] %agent [our.bowl %spider] %watch /thread-result/[tid]]
-      [%pass /thread/[ta-now] %agent [our.bowl %spider] %poke %spider-start !>(start-args)]
-    ==
+    (perform-initial-authorization +.act)
     ::
-      %sync-activity
+      %sync-activities
+    :: TODO: Do not allow sync if app is not connected
+    :: ?>  ()
     ?:  (gth (from-unix:chrono:userlib expires-at.auth.state) now.bowl)
-      (request-activities access-token.auth.state)
-    (refresh-access-token)
+      (request-activities access-token.auth.state sync.act)
+    (refresh-access-token sync.act)
   ==
-  :: ~&  act
-  :: =.  state  (poke-action act)
-  :: `this
   ::
-    ++  poke-action
-      |=  act=strava-action
-      ^-  _state
-      ?-    -.act
-          %save-connection-info
-        state
-          %sync-activity
-        state
-      ==
-    ++  refresh-access-token
-      |=  access-token=@t
+    :: ++  create-thread-cards
+    ::   |=  [thread-name=@tas thread-data=vase]
+    ::   ^-  (list card)
+    ::   =/  tid  `@ta`(cat 3 'thread_' (scot %uv (sham eny.bowl)))
+    ::   =/  ta-now  `@ta`(scot %da now.bowl)
+    ::   =/  start-args  [~ `tid byk.bowl(r da+now.bowl) thread-name thread-data]
+    ::   :~
+    ::     [%pass /thread/[ta-now] %agent [our.bowl %spider] %watch /thread-result/[tid]]
+    ::     [%pass /thread/[ta-now] %agent [our.bowl %spider] %poke %spider-start !>(start-args)]
+    ::   ==
+    ++  perform-initial-authorization
+      |=  [client-id=@ud client-secret=@t strava-code=@t] 
       ^-  (quip card _this)
+      =/  name  %strava-initial-authorization
+      =/  req-args  :*
+          (get-initial-auth-url [client-id client-secret strava-code])
+          client-id
+          client-secret
+        ==
       =/  tid  `@ta`(cat 3 'thread_' (scot %uv (sham eny.bowl)))
       =/  ta-now  `@ta`(scot %da now.bowl)
-      =/  start-args  [~ `tid byk.bowl(r da+now.bowl) %strava-refresh-authorization !>((get-refresh-auth-url 'wut'))]
+      =/  start-args  [~ `tid byk.bowl(r da+now.bowl) name !>(req-args)]
+      :_  this
+      :~
+        [%pass /thread/[ta-now] %agent [our.bowl %spider] %watch /thread-result/[tid]]
+        [%pass /thread/[ta-now] %agent [our.bowl %spider] %poke %spider-start !>(start-args)]
+      ==
+      :: (create-thread-cards %strava-initial-authorization !>(req-args))
+    ++  refresh-access-token
+      |=  sync=sync-params
+      ^-  (quip card _this)
+      =/  req-args  :*
+          (get-refresh-auth-url client-id.con-args.state client-secret.con-args.state refresh-token.auth.state)
+          sync
+        ==
+      =/  tid  `@ta`(cat 3 'thread_' (scot %uv (sham eny.bowl)))
+      =/  ta-now  `@ta`(scot %da now.bowl)
+      =/  start-args  [~ `tid byk.bowl(r da+now.bowl) %strava-refresh-authorization !>(req-args)]
       :_  this
       :~
         [%pass /thread/[ta-now] %agent [our.bowl %spider] %watch /thread-result/[tid]]
         [%pass /thread/[ta-now] %agent [our.bowl %spider] %poke %spider-start !>(start-args)]
       ==
     ++  request-activities
-      |=  access-token=@t
+      |=  [access-token=@t sync=sync-params]
       ^-  (quip card _this)
       =/  tid  `@ta`(cat 3 'thread_' (scot %uv (sham eny.bowl)))
       =/  ta-now  `@ta`(scot %da now.bowl)
       =/  req-args  :*
-          (get-activity-summary-url 'wut')
+          (get-activity-summary-url sync)
           access-token
         ==
       =/  start-args  [~ `tid byk.bowl(r da+now.bowl) %strava-sync-activity !>(req-args)]
-      :_  this
+      :_  this(state state(sync-status [%syncing sync]))
       :~
         [%pass /thread/[ta-now] %agent [our.bowl %spider] %watch /thread-result/[tid]]
         [%pass /thread/[ta-now] %agent [our.bowl %spider] %poke %spider-start !>(start-args)]
       ==
     ++  get-activity-summary-url
-      |=  wut=@t
+      |=  sync=sync-params
+      =/  page  (skip "{<page.sync>}" match-period)
       =/  ret-url  (weld api-base.urls.state "athlete/activities")
-      =.  ret-url  (weld ret-url "?per_page=10")
+      =.  ret-url  (weld ret-url "?per_page=2")
+      =.  ret-url  ?~  after.sync  ret-url
+        =/  after  (skip "{<(need after.sync)>}" match-period) 
+        (weld ret-url "&after={after}")
+      =.  ret-url  ?~  before.sync  ret-url
+        =/  before  (skip "{<(need before.sync)>}" match-period) 
+        (weld ret-url "&before={before}")
       ret-url
     ++  get-initial-auth-url
       |=  [client-id=@ud client-secret=@t strava-code=@t]
@@ -127,12 +146,12 @@
       =.  ret-url  (weld ret-url "&grant_type=authorization_code")
       ret-url
     ++  get-refresh-auth-url
-      |=  wut=@t
-      =/  c-id  (skip "{<client-id.con-args.state>}" match-period)
+      |=  [client-id=@ud client-secret=@t refresh-token=@t]
+      =/  c-id  (skip "{<client-id>}" match-period)
       =/  ret-url  oauth-base.urls.state
       =.  ret-url  (weld ret-url "?client_id={c-id}")
-      =.  ret-url  (weld ret-url "&client_secret={(trip client-secret.con-args.state)}")
-      =.  ret-url  (weld ret-url "&refresh_token={(trip refresh-token.auth.state)}")
+      =.  ret-url  (weld ret-url "&client_secret={(trip client-secret)}")
+      =.  ret-url  (weld ret-url "&refresh_token={(trip refresh-token)}")
       =.  ret-url  (weld ret-url "&grant_type=refresh_token")
       ret-url
   --
@@ -185,12 +204,26 @@
             %initial-authorization-response
           `this(state state(is-connected %.y, auth auth.res, con-args [client-id.res client-secret.res]))
             %refresh-authorization-response
+          =/  sync-poke  [%sync-activity sync.res]
           :_  this(state state(auth auth.res))
-          [%pass /strava/self/sync %agent [our.bowl %strava] %poke %strava-action !>([%sync-activity ''])]~
+          [%pass /strava/self/sync %agent [our.bowl %strava] %poke %strava-action !>(sync-poke)]~
             %sync-activity-response
-          =/  cards  (turn activities.res to-card)
-          :_  this
-          cards
+          ?-    -.sync-status.state  
+              %unsynced  !!
+              %synced    !!
+              %syncing 
+            =/  sync=sync-params  +.sync-status.state
+            ~&  sync
+            =/  cards  (turn activities.res to-card)
+            ~&  [%stopping-condition (lent activities.res) (lth (lent activities.res) 2)]
+            ?:  (lth (lent activities.res) 2)
+              [cards this(state state(sync-status [%synced %ranged (need after.sync) (need before.sync)]))]
+            =/  sync-poke  [%sync-activity sync(page +(page.sync))]
+            ~&  [%sync-poke sync-poke]
+            :_  this
+            :: (snoc cards [%pass /strava/self/sync %agent [our.bowl %strava] %poke %strava-action !>(sync-poke)])
+            cards
+          ==
         ==
       ==
     ==
@@ -229,9 +262,10 @@
   |=  act=strava-action
   ^-  _state
   ?-    -.act
+      %sync-all  !!
       %save-connection-info
     state
-      %sync-activity
+      %sync-activities
     state
   ==
 --

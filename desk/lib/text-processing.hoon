@@ -28,7 +28,9 @@
     ?:  =(month-number "11")  "Nov"
     ?:  =(month-number "12")  "Dec"
   !!
-
+++  to-tape-without-decimals
+  |=  num=@u
+  (remove-decimals "{<num>}")
 ++  match-comma
   |=  c=@tD
   =(c ',')
@@ -45,6 +47,9 @@
   |=  num=@ud
   ~&  [%removing-commas num ~(r at num)]
   (skip ~(r at num) match-comma)
+++  remove-decimals
+  |=  str=tape
+  (skip str match-period)
 ++  remove-whitespace
   |=  c=@tD
   (skip (trip c) match-whitespace)
