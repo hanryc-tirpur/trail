@@ -25,11 +25,23 @@
         ?-  -.type.status
           %ranged  !!
           %fully
-        (snoc params "after={(to-tape-without-decimals from.type.status)}")
+        (snoc params "after={(to-tape-without-decimals until.type.status)}")
         ==
       ::
         %unsynced
       (snoc params "before={(to-tape-without-decimals until-s)}")
     ==
   --
+++  get-next-status
+  |=  [status=api-sync-status act=strava-action]
+  ?+    -.act  !!
+      %sync-all
+    [%synced %fully (need until.act)]
+  ==
+++  get-populated-action
+  |=  action=strava-action
+  ?+    -.action  !!
+      %sync-all
+    [%sync-all `(fall until.action (unt:chrono:userlib now))]
+  ==
 --

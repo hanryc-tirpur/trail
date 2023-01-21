@@ -1,5 +1,5 @@
 /-  *strava, oauth2
-/+  default-agent, dbug, agentio, *text-processing
+/+  default-agent, dbug, agentio, *text-processing, *strava-sync
 |%
 +$  versioned-state
     $%  state-0
@@ -54,7 +54,10 @@
   ?.  ?=(%strava-action mark)  (on-poke:def mark vase)
   =/  act  !<(strava-action vase)
   ?-    -.act
-      %sync-all  !!
+      %sync-all
+    ?:  (gth (from-unix:chrono:userlib expires-at.auth.state) now.bowl)
+      (request-activities access-token.auth.state act)
+    (refresh-access-token act)
       %save-connection-info
     (perform-initial-authorization +.act)
     ::
@@ -62,8 +65,8 @@
     :: TODO: Do not allow sync if app is not connected
     :: ?>  ()
     ?:  (gth (from-unix:chrono:userlib expires-at.auth.state) now.bowl)
-      (request-activities access-token.auth.state sync.act)
-    (refresh-access-token sync.act)
+      (request-activities access-token.auth.state act)
+    (refresh-access-token act)
   ==
   ::
     :: ++  create-thread-cards
@@ -95,11 +98,11 @@
       ==
       :: (create-thread-cards %strava-initial-authorization !>(req-args))
     ++  refresh-access-token
-      |=  sync=sync-params
+      |=  act=strava-action
       ^-  (quip card _this)
       =/  req-args  :*
           (get-refresh-auth-url client-id.con-args.state client-secret.con-args.state refresh-token.auth.state)
-          sync
+          act
         ==
       =/  tid  `@ta`(cat 3 'thread_' (scot %uv (sham eny.bowl)))
       =/  ta-now  `@ta`(scot %da now.bowl)
@@ -110,32 +113,32 @@
         [%pass /thread/[ta-now] %agent [our.bowl %spider] %poke %spider-start !>(start-args)]
       ==
     ++  request-activities
-      |=  [access-token=@t sync=sync-params]
+      |=  [access-token=@t act=strava-action]
       ^-  (quip card _this)
+      =/  normalized-action  (get-populated-action act)
       =/  tid  `@ta`(cat 3 'thread_' (scot %uv (sham eny.bowl)))
       =/  ta-now  `@ta`(scot %da now.bowl)
       =/  req-args  :*
-          (get-activity-summary-url sync)
+          (get-activity-summary-url sync-status.state normalized-action)
           access-token
+          normalized-action
         ==
       =/  start-args  [~ `tid byk.bowl(r da+now.bowl) %strava-sync-activity !>(req-args)]
-      :_  this(state state(sync-status [%syncing sync]))
+      :_  this(state state(sync-status [%syncing act]))
       :~
         [%pass /thread/[ta-now] %agent [our.bowl %spider] %watch /thread-result/[tid]]
         [%pass /thread/[ta-now] %agent [our.bowl %spider] %poke %spider-start !>(start-args)]
       ==
+    ++  to-query
+      |=  query-params=(list tape)
+      ^-  tape
+      ?~  query-params  ""
+      %-  weld  :-  i.query-params
+      (roll t.query-params |=([part=tape url=tape] (weld url "&{part}")))
     ++  get-activity-summary-url
-      |=  sync=sync-params
-      =/  page  (skip "{<page.sync>}" match-period)
+      |=  [status=api-sync-status act=strava-action]
       =/  ret-url  (weld api-base.urls.state "athlete/activities")
-      =.  ret-url  (weld ret-url "?per_page=2")
-      =.  ret-url  ?~  after.sync  ret-url
-        =/  after  (skip "{<(need after.sync)>}" match-period) 
-        (weld ret-url "&after={after}")
-      =.  ret-url  ?~  before.sync  ret-url
-        =/  before  (skip "{<(need before.sync)>}" match-period) 
-        (weld ret-url "&before={before}")
-      ret-url
+      "{ret-url}?{(to-query (get-params status act))}"
     ++  get-initial-auth-url
       |=  [client-id=@ud client-secret=@t strava-code=@t]
       =/  c-id  (skip "{<client-id>}" match-period)
@@ -203,24 +206,21 @@
         ?-    -.res
             %initial-authorization-response
           `this(state state(is-connected %.y, auth auth.res, con-args [client-id.res client-secret.res]))
+        ::
             %refresh-authorization-response
-          =/  sync-poke  [%sync-activity sync.res]
           :_  this(state state(auth auth.res))
-          [%pass /strava/self/sync %agent [our.bowl %strava] %poke %strava-action !>(sync-poke)]~
+          [%pass /strava/self/sync %agent [our.bowl %strava] %poke %strava-action !>(action.res)]~
+        ::
             %sync-activity-response
           ?-    -.sync-status.state  
               %unsynced  !!
               %synced    !!
               %syncing 
-            =/  sync=sync-params  +.sync-status.state
-            ~&  sync
             =/  cards  (turn activities.res to-card)
-            ~&  [%stopping-condition (lent activities.res) (lth (lent activities.res) 2)]
-            ?:  (lth (lent activities.res) 2)
-              [cards this(state state(sync-status [%synced %ranged (need after.sync) (need before.sync)]))]
-            =/  sync-poke  [%sync-activity sync(page +(page.sync))]
-            ~&  [%sync-poke sync-poke]
-            :_  this
+              :: [cards this(state state(sync-status [%synced %ranged (need after.sync) (need before.sync)]))]
+            :: =/  sync-poke  [%sync-activity sync(page +(page.sync))]
+            :: ~&  [%sync-poke sync-poke]
+            :_  this(state state(sync-status (get-next-status sync-status.state action.res)))
             :: (snoc cards [%pass /strava/self/sync %agent [our.bowl %strava] %poke %strava-action !>(sync-poke)])
             cards
           ==

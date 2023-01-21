@@ -10,12 +10,12 @@
     ==
 +$  sync-params  [after=(unit @ud) before=(unit @ud) page=@ud]
 +$  synced-type
-  $%  [%fully from=@ud]
+  $%  [%fully until=@ud]
       [%ranged after=@ud before=@ud]
   ==
 +$  api-sync-status
   $%  [%unsynced m=@t] :: TODO: Make m(sg) a unit
-      [%syncing sync=sync-params]
+      [%syncing action=strava-action]
       [%synced type=synced-type]
   ==
 +$  api-urls  $:
@@ -35,8 +35,8 @@
       strava-activity-id=@ud
   ==
 +$  initial-auth-request  [url=tape con-args=connection-args]
-+$  refresh-auth-request  [url=tape sync=sync-params]
-+$  sync-activity-request  [url=tape access-token=@t]
++$  refresh-auth-request  [url=tape action=strava-action]
++$  sync-activity-request  [url=tape access-token=@t action=strava-action]
 +$  api-query-args
   $:
     after=(unit @ud)
@@ -50,7 +50,7 @@
   ==
 +$  thread-response
   $%  [%initial-authorization-response auth=refresh-response:oauth2 client-id=@ud client-secret=@t]
-      [%refresh-authorization-response auth=refresh-response:oauth2 sync=sync-params]
-      [%sync-activity-response activities=(list activity-summary)]
+      [%refresh-authorization-response auth=refresh-response:oauth2 action=strava-action]
+      [%sync-activity-response activities=(list activity-summary) action=strava-action]
   ==
 --

@@ -8,4 +8,4 @@
 =+  !<(sync-activity-request arg)
 ~&  [access-token url]
 ;<  activities-response=json  bind:m  (fetch-json-with-token:strandio access-token url)
-(pure:m !>([%sync-activity-response (dejs-activities activities-response)]))
+(pure:m !>([%sync-activity-response (dejs-activities activities-response) action]))

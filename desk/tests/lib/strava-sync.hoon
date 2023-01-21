@@ -16,4 +16,12 @@
     !>  ~["before=1674230243" "after=123456"]
     !>  (get-params:ss [%synced %fully 123.456] [%sync-all ~])
   ==
+++  test-get-next-status-when-sync-all
+  =/  action  [%sync-all `123.456]
+  =/  ss  ~(. strava-sync now)
+  ;:  weld
+  %+  expect-eq
+    !>  ~["before=1674230243" "after=123456"]
+    !>  (get-next-status:ss [%syncing action] action)
+  ==
 --

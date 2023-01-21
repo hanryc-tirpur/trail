@@ -19,6 +19,7 @@ import PedalBike from '@mui/icons-material/PedalBike'
 
 export type ActivitySummary = {
   id: string,
+  mapPolyline: string,
   name: string,
   timeMoving: number,
   totalElapsedTime: number,
@@ -37,7 +38,7 @@ export enum DistanceUnit {
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiaGFucnljLXRpcnB1ciIsImEiOiJjbGM5ODJpbTQwa3JpM3FwOGg1ZWJxZzFoIn0.aTFy6FZ_UD6Djp3QBZG6aw'
 
-export default function ActivitySummaryComponent({ id, name, timeMoving, totalElapsedTime, totalDistance }: ActivitySummary) {
+export default function ActivitySummaryComponent({ id, mapPolyline, name, timeMoving, totalElapsedTime, totalDistance }: ActivitySummary) {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const map = useRef<Map | null>(null);
   const [lng, setLng] = useState(-88.01478);
@@ -77,7 +78,7 @@ export default function ActivitySummaryComponent({ id, name, timeMoving, totalEl
         data: {
           type: 'Feature',
           properties: {},
-          geometry: polyline.toGeoJSON('e|e_GjkexOn@Jj@RP^LrMBfA@nAEZAXAlE@PDFJB\\?r@ChIEpADzDEH@HDd@^LDxA@v@ZXE\\QNEjG@RJBN@RAhDIjBqAvMqDja@w@zHyCv_@oA`NoAtKQrAMf@uDf\\a@|Cy@nFoAvHaBdJM^IHM@iG@yHE}IMgHAaTYy@G]Gw@Ws@c@q@o@UYU]cBaDKe@mC}EuAuByA_B_Au@QQiCwAm@Q{@S_C[wAEaG@}bA]iGBMBIFGJEPAzF?NCJIFIBMA]MgA_AWK}@CwAAOE_@[UBGGAQDa@HAJDDt@Qv@SRE@C?CKHDHcB@FAMAB@OFIDB@GXL?HIX@HJRTPLFN@zAAl@F\\Rj@f@^RZHd@CFGDMDg@?eAIyB'),
+          geometry: polyline.toGeoJSON(mapPolyline),
         }
       })
       map.current.addLayer({
@@ -153,7 +154,7 @@ export default function ActivitySummaryComponent({ id, name, timeMoving, totalEl
               Time
             </Grid>
             <Grid item xs={3}>
-              {`${totalDistance.val} ${totalDistance.unit}`}
+              {`${totalDistance.val.toFixed(2)} ${totalDistance.unit}`}
             </Grid>
             <Grid item xs={3}>
               {'n/a'}
