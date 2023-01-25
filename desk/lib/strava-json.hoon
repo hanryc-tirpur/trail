@@ -28,6 +28,15 @@
   :~  
     'elapsed_time'^ni
   ==
+++  dejs-action
+  =,  dejs:format
+  |=  jon=json
+  ^-  strava-action
+  %.  jon
+  %-  of
+  :~  
+    [%complete-connection (ot ~[client-id+ni client-secret+so code+so])]
+  ==
 ++  extract
   |*  [a=* b=@t]
   !<(_a [-:!>(a) b])

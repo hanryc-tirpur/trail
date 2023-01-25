@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useLoaderData } from 'react-router-dom'
-import Urbit from '@urbit/http-api';
+import Urbit from '@urbit/http-api'
 import { ChargeUpdateInitial, Scry } from '@urbit/api'
 
 import Grid from '@mui/material/Grid'

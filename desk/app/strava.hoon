@@ -58,7 +58,7 @@
     ?:  (gth (from-unix:chrono:userlib expires-at.auth.state) now.bowl)
       (request-activities access-token.auth.state act)
     (refresh-access-token act)
-      %save-connection-info
+      %complete-connection
     (perform-initial-authorization +.act)
     ::
       %sync-activities
@@ -263,7 +263,7 @@
   ^-  _state
   ?-    -.act
       %sync-all  !!
-      %save-connection-info
+      %complete-connection
     state
       %sync-activities
     state

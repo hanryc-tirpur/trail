@@ -1,12 +1,14 @@
 /-  *strava
-|_  act=action
+/+  *strava-json
+|_  act=strava-action
 ++  grow
   |%
   ++  noun  act
   --
 ++  grab
   |%
-  ++  noun  action
+  ++  noun  strava-action
+  ++  json  dejs-action
   --
 ++  grad  %noun
 --

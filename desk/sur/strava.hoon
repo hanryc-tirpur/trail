@@ -44,7 +44,7 @@
     page=@ud
   ==
 +$  strava-action
-  $%  [%save-connection-info client-id=@ud client-secret=@t strava-code=@t]
+  $%  [%complete-connection client-id=@ud client-secret=@t strava-code=@t]
       [%sync-activities sync=sync-params]
       [%sync-all until=(unit @ud)]
   ==

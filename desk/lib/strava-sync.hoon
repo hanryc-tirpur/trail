@@ -8,7 +8,7 @@
   |^
   ?-  -.act
     %sync-all  (params-for-sync-all +.act status)
-    %save-connection-info  !!
+    %complete-connection  !!
     %sync-activities  !!
   ==
   ::

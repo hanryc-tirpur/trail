@@ -18,6 +18,8 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import Dashboard, { loader as dashboardLoader } from './screens/Dashboard';
 // @ts-ignore Is .jsx page
 import ErrorPage from './screens/ErrorPage'
+import StravaSettings from './screens/integrations/strava/Settings'
+import StravaCompleteConnection from './screens/integrations/strava/CompleteConnection'
 
 const mdTheme = createTheme()
 
@@ -32,7 +34,10 @@ const router = createBrowserRouter([
       element: <Dashboard />,
     }, {
       path: 'integrations/strava',
-      element: <div>Strava!</div>,
+      element: <StravaSettings />,
+    }, {
+      path: 'integrations/strava/complete-connection',
+      element: <StravaCompleteConnection />,
     }],
   },
 ])
