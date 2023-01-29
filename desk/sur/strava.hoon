@@ -34,6 +34,13 @@
       map-polyline=tape
       strava-activity-id=@ud
   ==
++$  strava-connection-status
+  $:  is-connected=?
+      sync-status=api-sync-status
+  ==
++$  strava-status
+  $%  [%strava-connection-status strava-connection-status]
+  ==
 +$  initial-auth-request  [url=tape con-args=connection-args]
 +$  refresh-auth-request  [url=tape action=strava-action]
 +$  sync-activity-request  [url=tape access-token=@t action=strava-action]

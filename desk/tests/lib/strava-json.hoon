@@ -102,6 +102,50 @@
         ==
     !>  (dejs-action strava-action-json)
   ==
+++  remove-whitespace
+  |=  c=@tD
+  =/  newline  '\0a'
+  ?:  =(c ' ')  %.y
+    ?:  =(c newline)  %.y
+  %.n
+++  test-enjs-status-strava-connection-status-unsynced-to-json
+  =/  expected-json
+  '''
+  {
+    "type": "stravaConnectionStatus",
+    "payload": {
+      "syncStatus": {
+        "status": "synced",
+        "syncType": "fully",
+        "until": 987654
+      },
+      "isConnected": true
+    }
+  }
+  '''
+  ;:  weld
+  %+  expect-eq
+    !>  (skip (trip expected-json) remove-whitespace)
+    !>  (en-json:html (enjs-status [%strava-connection-status %.y %synced %fully 987.654]))
+  ==
+  ::
+  ++  test-enjs-status-strava-connection-status-fully-synced-to-json
+  =/  expected-json
+  '''
+  {
+    "type": "stravaConnectionStatus",
+    "payload": {
+      "syncStatus": {
+        "status": "unsynced",
+        "msg": ""
+      },
+      "isConnected": true
+    }
+  }
+  '''
+  ;:  weld
+  %+  expect-eq
+    !>  (skip (trip expected-json) remove-whitespace)
+    !>  (en-json:html (enjs-status [%strava-connection-status %.y %unsynced '']))
+  ==
 --
-
-

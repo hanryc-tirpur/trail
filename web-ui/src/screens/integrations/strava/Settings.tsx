@@ -1,7 +1,9 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useForm, SubmitHandler } from "react-hook-form"
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from "yup"
+import Urbit from '@urbit/http-api'
+import { ChargeUpdateInitial, Scry } from '@urbit/api'
 
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
@@ -52,7 +54,21 @@ export function AuthenticateStrava() {
   );
 }
 
+const api = new Urbit('', '', window.desk)
+api.ship = window.ship
+
 export default function Settings() {
+  useEffect(() => {
+    async function get() {
+      const res = await api.scry({
+        app: 'strava',
+        path: '/status/strava-status'
+      })
+      console.log(res)
+    } 
+    get()
+  })
+
   return (
     <Grid container spacing={3}>
       {/* Chart */}

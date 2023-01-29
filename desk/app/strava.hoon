@@ -164,19 +164,25 @@
   ^-  (unit (unit cage))
   ?>  (team:title our.bowl src.bowl)
   ?+    path  (on-peek:def path)
-      [%x %urls *]
+      [%x %status *]
     ?+    t.t.path  (on-peek:def path)
-      [%access ~]
-      =/  base-url  "https://www.strava.com/oauth/token"
-      =/  client-id  (skip "{<client-id.con-args.state>}" match-period)
-      =/  url-1  (weld base-url "?client_id={client-id}")
-      =/  url-2  (weld url-1 "&client_secret={(trip client-secret.con-args.state)}")
-      =/  url-3  (weld url-2 "&grant_type=refresh_token")
-      =/  url-4  (weld url-3 "&refresh_token={(trip refresh-token.auth.state)}")
-    ``noun+!>(url-4)
-      [%activities ~]
-      =/  activities-url  "https://www.strava.com/api/v3/athlete/activities"
-    ``noun+!>(activities-url)
+        [%strava-status ~]
+      :^  ~  ~  %strava-status
+      !>  ^-  strava-status
+      [%strava-connection-status is-connected.state sync-status.state]
+    :: ?+    t.t.path  (on-peek:def path)
+    ::   [%access ~]
+    ::   =/  base-url  "https://www.strava.com/oauth/token"
+    ::   =/  client-id  (skip "{<client-id.con-args.state>}" match-period)
+    ::   =/  url-1  (weld base-url "?client_id={client-id}")
+    ::   =/  url-2  (weld url-1 "&client_secret={(trip client-secret.con-args.state)}")
+    ::   =/  url-3  (weld url-2 "&grant_type=refresh_token")
+    ::   =/  url-4  (weld url-3 "&refresh_token={(trip refresh-token.auth.state)}")
+    :: ``noun+!>(url-4)
+    ::   [%activities ~]
+    ::   =/  activities-url  "https://www.strava.com/api/v3/athlete/activities"
+    :: ``noun+!>(activities-url)
+    :: ==
     ==
   ==
 ::

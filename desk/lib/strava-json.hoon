@@ -37,6 +37,44 @@
   :~  
     [%complete-connection (ot ~[client-id+ni client-secret+so code+so])]
   ==
+++  enjs-status
+  =,  enjs:format
+  |=  status=strava-status
+  ^-  json
+  ?-    -.status
+      %strava-connection-status
+      %-  pairs
+        :~  ['type' s+'stravaConnectionStatus']
+          :-  'payload' 
+          %-  pairs
+          :~  ['isConnected' b+is-connected.status]
+              ['syncStatus' (enjs-api-sync-status sync-status.status)]
+      ==  ==
+  ==
+++  enjs-api-sync-status
+  =,  enjs:format
+  |=  status=api-sync-status
+  ^-  json
+  ?-    -.status
+      %syncing    !!
+      %synced
+    =/  fully=synced-type  +.status
+    ?-    -.fully
+        %ranged  !!
+        %fully
+      %-  pairs
+      :~  ['status' s+-.status]
+          ['syncType' s+-.fully]
+          ['until' (numb until.fully)]
+      ==
+    ==
+    ::
+      %unsynced
+    %-  pairs
+    :~  ['status' s+-.status]
+        ['msg' s+m.status]
+    ==
+  ==
 ++  extract
   |*  [a=* b=@t]
   !<(_a [-:!>(a) b])
