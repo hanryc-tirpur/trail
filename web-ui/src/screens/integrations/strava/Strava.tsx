@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Outlet, useLoaderData, useOutletContext } from 'react-router-dom'
+import { LoaderFunctionArgs, Outlet, matchPath, redirect, useLoaderData, useOutletContext } from 'react-router-dom'
 import Urbit from '@urbit/http-api'
 
 import Grid from '@mui/material/Grid'
@@ -14,12 +14,14 @@ const api = new Urbit('', '', window.desk)
 api.ship = window.ship
 
 
-export async function loader(): Promise<StravaConnectionStatusResponse> {
+export async function loader({ request }: LoaderFunctionArgs): Promise<Response| StravaConnectionStatusResponse> {
     const res = await api.scry<StravaConnectionStatusResponse>({
       app: 'strava',
       path: '/status/strava-status'
     })
-  console.log(res)
+  if(matchPath('/apps/trail/integrations/strava/complete-connection', new URL(request.url).pathname)) {
+    return redirect('/apps/trail/integrations/strava')
+  }
   return { ...res }
 }
 
