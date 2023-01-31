@@ -36,6 +36,7 @@
   %-  of
   :~  
     [%complete-connection (ot ~[client-id+ni client-secret+so code+so])]
+    [%sync-all (ot ~[until+ni:dejs-soft:format])]
   ==
 ++  enjs-status
   =,  enjs:format
@@ -56,7 +57,6 @@
   |=  status=api-sync-status
   ^-  json
   ?-    -.status
-      %syncing    !!
       %synced
     =/  fully=synced-type  +.status
     ?-    -.fully
@@ -67,6 +67,11 @@
           ['syncType' s+-.fully]
           ['until' (numb until.fully)]
       ==
+    ==
+      %syncing
+    %-  pairs
+    :~  ['status' s+-.status]
+        ['action' s+'hi']
     ==
     ::
       %unsynced

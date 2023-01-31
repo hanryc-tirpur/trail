@@ -102,6 +102,23 @@
         ==
     !>  (dejs-action strava-action-json)
   ==
+++  test-dejs-sync-all
+  =/  strava-action-json  %-  need  %-  de-json:html
+  '''
+  {
+    "sync-all": {
+      "until": 1675134402
+    }
+  }
+  '''
+  ;:  weld
+  %+  expect-eq
+    !>  :*
+          %sync-all
+          `1.675.134.402
+        ==
+    !>  (dejs-action strava-action-json)
+  ==
 ++  remove-whitespace
   |=  c=@tD
   =/  newline  '\0a'

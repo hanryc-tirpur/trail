@@ -18,7 +18,8 @@
     =/  until-s  (fall until (unt:chrono:userlib now))
     =/  params=(list tape)  ~
     ?-    -.status
-        %syncing  !!
+        %syncing
+      (snoc params "before={(to-tape-without-decimals until-s)}")
       ::
         %synced
       =.  params  (snoc params "before={(to-tape-without-decimals until-s)}")

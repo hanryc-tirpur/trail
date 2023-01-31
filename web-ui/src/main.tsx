@@ -15,10 +15,11 @@ import '@fontsource/roboto/700.css'
 import 'mapbox-gl/dist/mapbox-gl.css'
 
 
-import Dashboard, { loader as dashboardLoader } from './screens/Dashboard';
+import Dashboard, { loader as dashboardLoader } from './screens/Dashboard'
+import Strava, { loader as stravaStatusLoader } from './screens/integrations/strava/Strava'
 // @ts-ignore Is .jsx page
 import ErrorPage from './screens/ErrorPage'
-import StravaSettings from './screens/integrations/strava/Settings'
+import StravaStatus from './screens/integrations/strava/Status'
 import StravaCompleteConnection from './screens/integrations/strava/CompleteConnection'
 
 const mdTheme = createTheme()
@@ -34,10 +35,17 @@ const router = createBrowserRouter([
       element: <Dashboard />,
     }, {
       path: 'integrations/strava',
-      element: <StravaSettings />,
-    }, {
-      path: 'integrations/strava/complete-connection',
-      element: <StravaCompleteConnection />,
+      element: <Strava />,
+      loader: stravaStatusLoader,
+      children: [{
+        index: true,
+        element: <StravaStatus />,
+        loader: stravaStatusLoader,
+      }, {
+        path: 'complete-connection',
+        element: <StravaCompleteConnection />,
+        loader: stravaStatusLoader,
+      }]
     }],
   },
 ])
