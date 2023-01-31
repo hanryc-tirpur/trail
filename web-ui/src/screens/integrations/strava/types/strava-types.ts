@@ -10,6 +10,7 @@ export type StravaUnsynced = {
 
 export type StravaSynced = {
   status: 'synced',
+  until: number,
 }
 
 export type StravaConnectionStatus = {

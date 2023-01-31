@@ -8,14 +8,46 @@ import SyncIcon from '@mui/icons-material/Sync'
 
 import Title from './Title'
 
-import type { StravaConnectionStatus } from '../types/strava-types'
+import type { StravaConnectionStatus, StravaSynced } from '../types/strava-types'
+import { dateAndTimeStringFromSeconds } from '../../../../util/date-formats'
 
 const api = new Urbit('', '', window.desk)
 api.ship = window.ship
 
-function Synced() {
+
+const syncAll = async () => {
+  const pokeResult = await api.poke({
+    app: 'strava',
+    mark: 'strava-action',
+    json: {
+      'sync-all': {
+        'until': Math.floor(Date.now() / 1000),
+      }
+    }
+  })
+}
+
+function Synced({ until }: StravaSynced) {
   return (
-    <div>Synced</div>
+    <div>
+      <Typography> 
+        You are connected to Strava, and have already imported Activities.
+      </Typography>
+
+      <Typography display={'inline-block'}> 
+        Latest import:{' '}
+      </Typography>
+
+      <Typography fontWeight={'bold'} display={'inline-block'}> 
+        {dateAndTimeStringFromSeconds(until)}
+      </Typography>
+
+      <div>
+        <Button variant="contained" endIcon={<SyncIcon />} onClick={syncAll}>
+          Import Latest
+        </Button>
+      </div>
+    </div>
   )
 }
 
@@ -26,21 +58,9 @@ function Syncing() {
 }
 
 function Unsynced() {
-  const syncAll = async () => {
-    const pokeResult = await api.poke({
-      app: 'strava',
-      mark: 'strava-action',
-      json: {
-        'sync-all': {
-          'until': Math.floor(Date.now() / 1000),
-        }
-      }
-    })
-  }
-
   return (
     <div>
-      <Typography fontWeight={'bold'}>
+      <Typography> 
         You have connected to Strava, but you have not yet imported any Activies.
       </Typography>
 
@@ -58,7 +78,7 @@ export default function ActivitySync({ isConnected, syncStatus }: StravaConnecti
       { syncStatus.status === 'unsynced'
         ? (<Unsynced />)
         : syncStatus.status === 'synced'
-          ? (<Synced />)
+          ? (<Synced {... syncStatus} />)
           : (<Syncing />)
       }
     </>
