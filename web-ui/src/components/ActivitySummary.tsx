@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 import { DateTime } from 'luxon'
-import mapboxgl, { Map } from 'mapbox-gl'
+import mapboxgl, { Map, MapboxOptions } from 'mapbox-gl'
 import polyline from '@mapbox/polyline'
+import bbox from '@turf/bbox'
+import center from '@turf/center'
 
 import Avatar from '@mui/material/Avatar'
 import Card from '@mui/material/Card'
@@ -39,24 +41,35 @@ export enum DistanceUnit {
 mapboxgl.accessToken = 'pk.eyJ1IjoiaGFucnljLXRpcnB1ciIsImEiOiJjbGM5ODJpbTQwa3JpM3FwOGg1ZWJxZzFoIn0.aTFy6FZ_UD6Djp3QBZG6aw'
 
 export default function ActivitySummaryComponent({ id, mapPolyline, name, timeMoving, totalElapsedTime, totalDistance }: ActivitySummary) {
-  const mapContainer = useRef<HTMLDivElement | null>(null);
-  const map = useRef<Map | null>(null);
-  const [lng, setLng] = useState(-88.01478);
-  const [lat, setLat] = useState(41.97843);
-  const [zoom, setZoom] = useState(12);
+  const mapContainer = useRef<HTMLDivElement | null>(null)
+  const map = useRef<Map | null>(null)
+  const geo = polyline.toGeoJSON(mapPolyline)
+  const box = bbox(geo)
+  const cen = center(geo)
+  console.log(box, cen)
+  const [lng, setLng] = useState(cen.geometry.coordinates[0])
+  const [lat, setLat] = useState(cen.geometry.coordinates[1])
+  const [zoom, setZoom] = useState(12)
 
   useEffect(() => {
     if (map.current) return; // initialize map only once
 
     if(mapContainer.current !== null) {
-      map.current = new mapboxgl.Map({
+      const opts: MapboxOptions = {
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/streets-v12',
-        center: [lng, lat],
-        zoom: zoom,
-      });
+      }
+      if(box.length === 4) {
+        opts.bounds = box
+        opts.fitBoundsOptions = {
+          padding: 25
+        }
+      } else {
+        opts.center = [lng, lat]
+      }
+      map.current = new mapboxgl.Map(opts)
     }
-  });
+  })
 
   useEffect(() => {
     if (map.current === null) return; // wait for map to initialize
@@ -67,7 +80,7 @@ export default function ActivitySummaryComponent({ id, mapPolyline, name, timeMo
         setLat(Number(map.current.getCenter().lat.toFixed(4)))
         setZoom(Number(map.current.getZoom().toFixed(2)))
       }
-    });
+    })
 
     map.current.on('load', () => {
       if (map.current === null) return
@@ -78,7 +91,7 @@ export default function ActivitySummaryComponent({ id, mapPolyline, name, timeMo
         data: {
           type: 'Feature',
           properties: {},
-          geometry: polyline.toGeoJSON(mapPolyline),
+          geometry: geo,
         }
       })
       map.current.addLayer({
@@ -90,8 +103,8 @@ export default function ActivitySummaryComponent({ id, mapPolyline, name, timeMo
           'line-cap': 'round'
         },
         'paint': {
-          'line-color': '#888',
-          'line-width': 8
+          'line-color': '#454545',
+          'line-width': 3,
         }
       });
     })
