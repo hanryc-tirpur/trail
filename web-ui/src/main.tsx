@@ -19,8 +19,8 @@ import Dashboard, { loader as dashboardLoader } from './screens/Dashboard'
 import Strava, { loader as stravaStatusLoader } from './screens/integrations/strava/Strava'
 // @ts-ignore Is .jsx page
 import ErrorPage from './screens/ErrorPage'
-import StravaStatus from './screens/integrations/strava/Status'
-import StravaCompleteConnection from './screens/integrations/strava/CompleteConnection'
+import ActivitySync from './screens/integrations/strava/components/ActivitySync'
+import Connect, { loader as connectLoader } from './screens/integrations/strava/components/Connect'
 
 const mdTheme = createTheme()
 
@@ -39,12 +39,11 @@ const router = createBrowserRouter([
       loader: stravaStatusLoader,
       children: [{
         index: true,
-        element: <StravaStatus />,
-        loader: stravaStatusLoader,
+        element: <ActivitySync />,
       }, {
-        path: 'complete-connection',
-        element: <StravaCompleteConnection />,
-        loader: stravaStatusLoader,
+        path: 'connect',
+        element: <Connect />,
+        loader: connectLoader,
       }]
     }],
   },

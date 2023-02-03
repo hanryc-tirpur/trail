@@ -8,8 +8,9 @@ import SyncIcon from '@mui/icons-material/Sync'
 
 import Title from './Title'
 
-import type { StravaConnectionStatus, StravaSynced } from '../types/strava-types'
+import type { StravaSynced } from '../types/strava-types'
 import { dateAndTimeStringFromSeconds } from '../../../../util/date-formats'
+import { useConnectionStatus } from '../Strava'
 
 const api = new Urbit('', '', window.desk)
 api.ship = window.ship
@@ -28,6 +29,7 @@ const syncAll = async () => {
 }
 
 function Synced({ until }: StravaSynced) {
+  
   return (
     <div>
       <Typography> 
@@ -71,7 +73,9 @@ function Unsynced() {
   )
 }
 
-export default function ActivitySync({ isConnected, syncStatus }: StravaConnectionStatus) {
+export default function ActivitySync() {
+  const { syncStatus } = useConnectionStatus()
+
   return (
     <>
       <Title>Activity Sync</Title>

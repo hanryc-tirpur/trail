@@ -3,6 +3,8 @@ import { useForm, SubmitHandler } from "react-hook-form"
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from "yup"
 
+import Title from './Title'
+import { Typography } from '@mui/material'
 
 const schema = yup.object({
   client_id: yup.number().positive().integer().required(),
@@ -18,7 +20,7 @@ type Inputs = {
   state: string,
 }
 
-export default function StartConnection() {
+export default function StravaAuthorization() {
   const { register, handleSubmit, watch, formState: { errors } } = useForm<Inputs>({
     resolver: yupResolver(schema)
   })
@@ -33,18 +35,24 @@ export default function StartConnection() {
   }
 
   return (
-    <form encType="form/url-encoded" onSubmit={handleSubmit(onSubmit)} action="https://www.strava.com/oauth/authorize">
-      <input {...register('client_id')} />
-      {errors.client_id && <span>This field is required</span>}
-      
-      <input {...register('client_secret')} />
-      {errors.client_secret && <span>This field is required</span>}
+    <>
+      <Title>Connect to Strava</Title>
+      <Typography>
+        
+      </Typography>
+      <form encType="form/url-encoded" onSubmit={handleSubmit(onSubmit)} action="https://www.strava.com/oauth/authorize">
+        <input {...register('client_id')} />
+        {errors.client_id && <span>This field is required</span>}
+        
+        <input {...register('client_secret')} />
+        {errors.client_secret && <span>This field is required</span>}
 
-      <input type="submit" />
-      
-      <input type="hidden" {...register('redirect_uri')} defaultValue={`${location.href}/complete-connection`} />
-      <input type="hidden" {...register('response_type')} defaultValue="code" />
-      <input type="hidden" {...register('scope')} defaultValue="activity:read_all,activity:write" />
-    </form>
-  );
+        <input type="submit" />
+        
+        <input type="hidden" {...register('redirect_uri')} defaultValue={`${location.href}`} />
+        <input type="hidden" {...register('response_type')} defaultValue="code" />
+        <input type="hidden" {...register('scope')} defaultValue="activity:read_all,activity:write" />
+      </form>
+    </>
+  )
 }

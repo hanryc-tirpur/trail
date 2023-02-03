@@ -8,30 +8,36 @@ import Typography from '@mui/material/Typography'
 
 import Title from './components/Title'
 
-import type { StravaConnectionStatusResponse } from './types/strava-types'
+import type { StravaConnectionStatus, StravaConnectionStatusResponse,  } from './types/strava-types'
 
 const api = new Urbit('', '', window.desk)
 api.ship = window.ship
 
+// @ts-ignore useLoaderData does not return typed data
+window.matchPath = matchPath
 
-export async function loader({ request }: LoaderFunctionArgs): Promise<Response| StravaConnectionStatusResponse> {
-    const res = await api.scry<StravaConnectionStatusResponse>({
-      app: 'strava',
-      path: '/status/strava-status'
-    })
-  if(matchPath('/apps/trail/integrations/strava/complete-connection', new URL(request.url).pathname)) {
+export async function loader({ request }: LoaderFunctionArgs): Promise<Response | StravaConnectionStatus> {
+  const { payload } = await api.scry<StravaConnectionStatusResponse>({
+    app: 'strava',
+    path: '/status/strava-status'
+  })
+  
+  if(payload.isConnected && !matchPath('/apps/trail/integrations/strava', new URL(request.url).pathname)) {
     return redirect('/apps/trail/integrations/strava')
+  } else if(!payload.isConnected && !matchPath('/apps/trail/integrations/strava/connect', new URL(request.url).pathname)) {
+    return redirect('connect')
   }
-  return { ...res }
+
+  return {... payload}
 }
 
 export function useConnectionStatus() {
-  return useOutletContext<StravaConnectionStatusResponse>()
+  return useOutletContext<StravaConnectionStatus>()
 }
 
 export default function Strava() {
   // @ts-ignore useLoaderData does not return typed data
-  const connectionStatus: StravaConnectionStatusResponse = useLoaderData()
+  const connectionStatus: StravaConnectionStatus = useLoaderData()
 
   return (
     <Grid container spacing={3}>
@@ -49,7 +55,7 @@ export default function Strava() {
           <div>
             Status: 
             <Typography fontWeight={'bold'}>
-              {connectionStatus.payload.isConnected ? ' Connected' : ' Not Connected'}
+              {connectionStatus.isConnected ? ' Connected' : ' Not Connected'}
             </Typography>
           </div>
         </Paper>
