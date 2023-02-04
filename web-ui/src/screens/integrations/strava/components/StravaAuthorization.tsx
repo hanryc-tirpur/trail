@@ -24,6 +24,8 @@ export default function StravaAuthorization() {
   const { register, handleSubmit, watch, formState: { errors } } = useForm<Inputs>({
     resolver: yupResolver(schema)
   })
+  const client_id = ''
+  const client_secret = ''
   const onSubmit: SubmitHandler<Inputs> = (data, evt) => {
     data = {
       ... data,
@@ -36,19 +38,15 @@ export default function StravaAuthorization() {
 
   return (
     <>
-      <Title>Connect to Strava</Title>
+      <Title>Authorize %trail</Title>
       <Typography>
-        
+        After clicking the Next button, you will be taken to the Strava website, and will be asked to 
+        authorize the %trail app to read your activity data. After %trail is authorized, you will be
+        brought back to the app to complete the connection process.
       </Typography>
       <form encType="form/url-encoded" onSubmit={handleSubmit(onSubmit)} action="https://www.strava.com/oauth/authorize">
-        <input {...register('client_id')} />
-        {errors.client_id && <span>This field is required</span>}
-        
-        <input {...register('client_secret')} />
-        {errors.client_secret && <span>This field is required</span>}
-
-        <input type="submit" />
-        
+        <input type="hidden" {...register('client_id')} defaultValue={`${client_id}`} />
+        <input type="hidden" {...register('client_secret')} defaultValue={`${client_secret}`} />
         <input type="hidden" {...register('redirect_uri')} defaultValue={`${location.href}`} />
         <input type="hidden" {...register('response_type')} defaultValue="code" />
         <input type="hidden" {...register('scope')} defaultValue="activity:read_all,activity:write" />

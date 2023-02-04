@@ -106,7 +106,7 @@ export default function Connect() {
 
 
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
       <Stepper activeStep={activeStep}>
         {steps.map((label, index) => {
           const stepProps: { completed?: boolean } = {}
@@ -140,6 +140,7 @@ export default function Connect() {
         </React.Fragment>
       ) : (
         <React.Fragment>
+          <Box sx={{ flexGrow: 1, padding: '25px' }}>
           {activeStep === 3 && state !== null
             ? <ConnectStrava {... state} />
             : activeStep === 2
@@ -148,6 +149,7 @@ export default function Connect() {
                 ? <StravaClientInfo />
                 : <CreateStravaApp />
           }
+          </Box>
           <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
             <Button
               color="inherit"

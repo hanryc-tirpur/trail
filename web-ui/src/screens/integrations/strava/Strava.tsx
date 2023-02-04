@@ -67,7 +67,7 @@ export default function Strava() {
             p: 2,
             display: 'flex',
             flexDirection: 'column',
-            height: 240,
+            height: 365,
           }}
         >
           <Outlet context={connectionStatus} />
