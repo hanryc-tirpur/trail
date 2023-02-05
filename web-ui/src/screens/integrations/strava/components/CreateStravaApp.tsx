@@ -1,15 +1,13 @@
 import React from 'react'
 
-import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
-import Checkbox from '@mui/material/Checkbox'
 import Grid from '@mui/material/Grid'
 import Link from '@mui/material/Link'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
-import { Label } from '@mui/icons-material'
-import { useLocation } from 'react-router-dom'
+
+
+export interface Inputs {
+  type: 'CreateStravaApp',
+}
 
 
 export default function CreateStravaApp() {

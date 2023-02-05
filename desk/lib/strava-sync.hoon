@@ -10,6 +10,7 @@
     %sync-all  (params-for-sync-all +.act status)
     %complete-connection  !!
     %sync-activities  !!
+    %save-client-info  !!
   ==
   ::
     ++  params-for-sync-all

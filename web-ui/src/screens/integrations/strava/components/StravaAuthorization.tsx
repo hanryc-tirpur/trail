@@ -3,34 +3,31 @@ import { useForm, SubmitHandler } from "react-hook-form"
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from "yup"
 
-import Title from './Title'
 import { Typography } from '@mui/material'
+
+import Title from './Title'
+import { StravaClientInfo } from '../types/strava-types'
+
+export interface Inputs extends StravaClientInfo {
+  type: 'StravaAuthorization',
+}
 
 const schema = yup.object({
   client_id: yup.number().positive().integer().required(),
   client_secret: yup.string().required(),
 })
 
-type Inputs = {
-  client_id: string,
-  client_secret: string,
+interface AuthorizationValues extends Record<string, string>, StravaClientInfo {
   redirect_uri: string,
   response_type: string,
   scope: string,
-  state: string,
 }
 
-export default function StravaAuthorization() {
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<Inputs>({
+export default function StravaAuthorization({ client_id, client_secret }: Inputs) {
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<AuthorizationValues>({
     resolver: yupResolver(schema)
   })
-  const client_id = ''
-  const client_secret = ''
-  const onSubmit: SubmitHandler<Inputs> = (data, evt) => {
-    data = {
-      ... data,
-      state: btoa(JSON.stringify({ client_id: data.client_id, client_secret: data.client_secret }))
-    }
+  const onSubmit: SubmitHandler<AuthorizationValues> = (data: Record<string, string>, evt) => {
     const url = new URL(`${evt?.target.action}?${new URLSearchParams(data).toString()}`)
     location.href = url.toString()
     console.log(data, evt?.target.action)

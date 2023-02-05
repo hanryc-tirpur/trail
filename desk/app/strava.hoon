@@ -7,7 +7,7 @@
 +$  state-0
   $:  %0
       is-connected=?
-      con-args=connection-args
+      con-args=(unit connection-args)
       auth=refresh-response:oauth2
       urls=api-urls
       sync-status=api-sync-status
@@ -54,6 +54,7 @@
   ?.  ?=(%strava-action mark)  (on-poke:def mark vase)
   =/  act  !<(strava-action vase)
   ?-    -.act
+      %save-client-info  !!
       %sync-all
     ?:  (gth (from-unix:chrono:userlib expires-at.auth.state) now.bowl)
       (request-activities access-token.auth.state act)
@@ -80,13 +81,14 @@
     ::     [%pass /thread/[ta-now] %agent [our.bowl %spider] %poke %spider-start !>(start-args)]
     ::   ==
     ++  perform-initial-authorization
-      |=  [client-id=@ud client-secret=@t strava-code=@t] 
+      |=  strava-code=@t
       ^-  (quip card _this)
       =/  name  %strava-initial-authorization
+      =/  c-info  (need con-args.state)
       =/  req-args  :*
-          (get-initial-auth-url [client-id client-secret strava-code])
-          client-id
-          client-secret
+          (get-initial-auth-url [client-id.c-info client-secret.c-info strava-code])
+          client-id.c-info
+          client-secret.c-info
         ==
       =/  tid  `@ta`(cat 3 'thread_' (scot %uv (sham eny.bowl)))
       =/  ta-now  `@ta`(scot %da now.bowl)
@@ -100,8 +102,9 @@
     ++  refresh-access-token
       |=  act=strava-action
       ^-  (quip card _this)
+      =/  c-info  (need con-args.state)
       =/  req-args  :*
-          (get-refresh-auth-url client-id.con-args.state client-secret.con-args.state refresh-token.auth.state)
+          (get-refresh-auth-url client-id.c-info client-secret.c-info refresh-token.auth.state)
           act
         ==
       =/  tid  `@ta`(cat 3 'thread_' (scot %uv (sham eny.bowl)))
@@ -170,6 +173,10 @@
       :^  ~  ~  %strava-status
       !>  ^-  strava-status
       [%strava-connection-status is-connected.state sync-status.state]
+        [%strava-client-info ~]
+      :^  ~  ~  %strava-status
+      !>  ^-  strava-status
+      [%strava-client-info con-args.state]
     :: ?+    t.t.path  (on-peek:def path)
     ::   [%access ~]
     ::   =/  base-url  "https://www.strava.com/oauth/token"
@@ -211,7 +218,7 @@
         =/  res  !<(thread-response q.cage.sign)
         ?-    -.res
             %initial-authorization-response
-          `this(state state(is-connected %.y, auth auth.res, con-args [client-id.res client-secret.res]))
+          `this(state state(is-connected %.y, auth auth.res, con-args `[client-id.res client-secret.res]))
         ::
             %refresh-authorization-response
           :_  this(state state(auth auth.res))
@@ -269,6 +276,7 @@
   ^-  _state
   ?-    -.act
       %sync-all  !!
+      %save-client-info  !!
       %complete-connection
     state
       %sync-activities

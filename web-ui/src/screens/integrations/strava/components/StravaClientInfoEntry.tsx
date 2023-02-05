@@ -5,7 +5,12 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
 
-export default function CreateStravaApp() {
+export interface Inputs {
+  type: 'StravaClientInfoEntry',
+}
+
+
+export default function StravaClientInfoEntry() {
   return (
     <>
     <Typography component="h2" variant="h6" color="primary" gutterBottom>

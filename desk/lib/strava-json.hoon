@@ -35,7 +35,7 @@
   %.  jon
   %-  of
   :~  
-    [%complete-connection (ot ~[client-id+ni client-secret+so code+so])]
+    [%complete-connection code+so]
     [%sync-all (ot ~[until+ni:dejs-soft:format])]
   ==
 ++  enjs-status
@@ -50,6 +50,20 @@
           %-  pairs
           :~  ['isConnected' b+is-connected.status]
               ['syncStatus' (enjs-api-sync-status sync-status.status)]
+      ==  ==
+      %strava-client-info
+      ?~  con-args.status
+        %-  pairs
+        :~  ['hasClientInfo' b+%.n]
+            ['clientInfo' ~]
+        ==
+      =/  c-args  (need con-args.status)
+      %-  pairs
+        :~  ['hasClientInfo' b+%.y]
+          :-  'clientInfo' 
+          %-  pairs
+          :~  ['client_id' (numb client-id.c-args)]
+              ['client_secret' s+client-secret.c-args]
       ==  ==
   ==
 ++  enjs-api-sync-status

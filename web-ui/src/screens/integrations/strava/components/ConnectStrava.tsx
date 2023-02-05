@@ -5,14 +5,12 @@ import Urbit from '@urbit/http-api'
 import * as yup from "yup"
 
 import Typography from '@mui/material/Typography'
+import { StravaClientInfo } from '../types/strava-types'
 
-interface Inputs extends ClientState {
+
+export interface Inputs extends StravaClientInfo {
+  type: 'ConnectStrava'
   code: string,
-}
-
-interface ClientState {
-  client_id: string,
-  client_secret: string,
 }
 
 const api = new Urbit('', '', window.desk)

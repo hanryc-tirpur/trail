@@ -1,5 +1,5 @@
 import React from 'react'
-import { redirect, useLoaderData } from 'react-router-dom'
+import { LoaderFunctionArgs, redirect, useLoaderData } from 'react-router-dom'
 
 import Urbit from '@urbit/http-api'
 
@@ -10,55 +10,84 @@ import StepLabel from '@mui/material/StepLabel'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 
-import ConnectStrava from './ConnectStrava'
-import CreateStravaApp from './CreateStravaApp'
-import StravaAuthorization from './StravaAuthorization'
-import StravaClientInfo from './StravaClientInfo'
+import ConnectStrava from './components/ConnectStrava'
+import CreateStravaApp from './components/CreateStravaApp'
+import StravaAuthorization from './components/StravaAuthorization'
+import StravaClientInfoEntry from './components/StravaClientInfoEntry'
 
+import { Inputs as ConnectStravaInputs } from './components/ConnectStrava'
+import { Inputs as CreateStravaAppInputs } from './components/CreateStravaApp'
+import { Inputs as StravaAuthorizationInputs } from './components/StravaAuthorization'
+import { Inputs as StravaClientInfoEntryInputs } from './components/StravaClientInfoEntry'
+
+import type {
+  ConnectionProcessState,
+  StravaClientInfo,
+  StravaClientInfoResponse,
+  StravaConnectionStatus,
+  StravaConnectionStatusResponse,
+} from './types/strava-types'
+
+type Step<T> = T & {
+  index: number,
+}
+
+type Steps = Step<CreateStravaAppInputs> & { index: 0 }
+  | Step<StravaClientInfoEntryInputs> & { index: 1 }
+  | Step<StravaAuthorizationInputs> & { index: 2 }
+  | Step<ConnectStravaInputs> & { index: 3 }
 
 const api = new Urbit('', '', window.desk)
 api.ship = window.ship
 
-interface ConnectProcessStatus {
-  pageIndex: number,
-  state: ClientState | null,
-}
 
-interface ClientState {
-  client_id: string,
-  client_secret: string,
-  code: string,
-}
+export async function loader({ request }: LoaderFunctionArgs): Promise<Response | Steps> {
+  const { payload } = await api.scry<StravaConnectionStatusResponse>({
+    app: 'strava',
+    path: '/status/strava-status'
+  })
+  
+  if(payload.isConnected) {
+    return redirect('/apps/trail/integrations/strava')
+  }
 
-export function loader(): ConnectProcessStatus {
-  console.log('connect loader')
-  // scry for "connection state"?
-  const url = new URL(location.href)
-  const stateVal = url.searchParams.get('state')
+  const { hasClientInfo, clientInfo } = await api.scry<StravaClientInfoResponse>({
+    app: 'strava',
+    path: '/status/strava-client-info'
+  })
+
+  if(!hasClientInfo) {
+    return {
+      index: 0,
+      type: 'CreateStravaApp',
+    }
+  }
+  
+  const url = new URL(request.url)
   const code = url.searchParams.get('code')
 
-  if(stateVal && code) {
-    const state: ClientState = {
-      ... JSON.parse(atob(stateVal)),
-      code
-    }
+  if(!code) {
     return {
-      pageIndex: 3,
-      state,
+      index: 2,
+      type: 'StravaAuthorization',
+      ... clientInfo,
     }
   }
 
-  return { pageIndex: 0, state: null }
+  return {
+    index: 3,
+    type: 'ConnectStrava',
+    ... clientInfo,
+    code,
+  }
 }
 
 const steps = ['Create Strava App', 'Enter Strava Client Info', 'Request Strava Authorization', 'Connect']
 
 export default function Connect() {
   // @ts-ignore useLoaderData does not return typed data
-  const d: ConnectProcessStatus = useLoaderData()
-  console.log('Connect', d)
-  const { pageIndex, state } = d
-  const [activeStep, setActiveStep] = React.useState(pageIndex)
+  const activeStepItem: Steps = useLoaderData()
+  const [activeStep, setActiveStep] = React.useState<number>(activeStepItem.index)
   const [skipped, setSkipped] = React.useState(new Set<number>())
 
   const isStepOptional = (step: number) => {
@@ -141,12 +170,12 @@ export default function Connect() {
       ) : (
         <React.Fragment>
           <Box sx={{ flexGrow: 1, padding: '25px' }}>
-          {activeStep === 3 && state !== null
-            ? <ConnectStrava {... state} />
-            : activeStep === 2
-              ? <StravaAuthorization />
-              : activeStep === 1
-                ? <StravaClientInfo />
+          {activeStepItem.index === 3 
+            ? <ConnectStrava {... activeStepItem} />
+            : activeStepItem.index === 2
+              ? <StravaAuthorization {... activeStepItem} />
+              : activeStepItem.index === 1
+                ? <StravaClientInfoEntry />
                 : <CreateStravaApp />
           }
           </Box>
@@ -165,7 +194,7 @@ export default function Connect() {
                 Skip
               </Button>
             )}
-            <Button onClick={handleNext} disabled={activeStep === 2 && state === null}>
+            <Button onClick={handleNext} disabled={activeStep === 2}>
               {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
             </Button>
           </Box>

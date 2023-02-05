@@ -20,7 +20,7 @@ import Strava, { loader as stravaStatusLoader } from './screens/integrations/str
 // @ts-ignore Is .jsx page
 import ErrorPage from './screens/ErrorPage'
 import ActivitySync from './screens/integrations/strava/components/ActivitySync'
-import Connect, { loader as connectLoader } from './screens/integrations/strava/components/Connect'
+import StravaConnect, { loader as connectLoader } from './screens/integrations/strava/Connect'
 
 const mdTheme = createTheme()
 
@@ -40,11 +40,11 @@ const router = createBrowserRouter([
       children: [{
         index: true,
         element: <ActivitySync />,
-      }, {
-        path: 'connect',
-        element: <Connect />,
-        loader: connectLoader,
-      }]
+      }],
+    }, {
+      path: 'integrations/strava/connect',
+      element: <StravaConnect />,
+      loader: connectLoader,
     }],
   },
 ])

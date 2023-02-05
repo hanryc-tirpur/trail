@@ -40,6 +40,7 @@
   ==
 +$  strava-status
   $%  [%strava-connection-status strava-connection-status]
+      [%strava-client-info con-args=(unit connection-args)]
   ==
 +$  initial-auth-request  [url=tape con-args=connection-args]
 +$  refresh-auth-request  [url=tape action=strava-action]
@@ -51,7 +52,8 @@
     page=@ud
   ==
 +$  strava-action
-  $%  [%complete-connection client-id=@ud client-secret=@t strava-code=@t]
+  $%  [%save-client-info client-id=@ud client-secret=@t]
+      [%complete-connection strava-code=@t]
       [%sync-activities sync=sync-params]
       [%sync-all until=(unit @ud)]
   ==
