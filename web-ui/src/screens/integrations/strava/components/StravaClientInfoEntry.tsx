@@ -23,18 +23,22 @@ const api = new Urbit('', '', window.desk)
 api.ship = window.ship
 
 export default function StravaClientInfoEntry({ onNext }: any) {
-  const { register, trigger, formState: { errors } } = useForm<StravaClientInfo>({
+  const { getValues, register, trigger, formState: { errors } } = useForm<StravaClientInfo>({
     resolver: yupResolver(schema)
   })
 
-  onNext(async (data: StravaClientInfo) => {
+  onNext(async () => {
     const isValid = await trigger()
     if(!isValid) return { isSuccessful: false }
+    const data = getValues()
     const pokeResult = await api.poke({
       app: 'strava',
       mark: 'strava-action',
       json: {
-        'save-client-info': data
+        'save-client-info': {
+          'client-id': parseInt(data.client_id, 10),
+          'client-secret': data.client_secret,
+        }
       }
     })
   })

@@ -54,7 +54,8 @@
   ?.  ?=(%strava-action mark)  (on-poke:def mark vase)
   =/  act  !<(strava-action vase)
   ?-    -.act
-      %save-client-info  !!
+      %save-client-info
+    `this(state state(con-args `+.act))
       %sync-all
     ?:  (gth (from-unix:chrono:userlib expires-at.auth.state) now.bowl)
       (request-activities access-token.auth.state act)

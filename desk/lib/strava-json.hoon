@@ -36,6 +36,7 @@
   %-  of
   :~  
     [%complete-connection code+so]
+    [%save-client-info (ot ~[client-id+ni client-secret+so])]
     [%sync-all (ot ~[until+ni:dejs-soft:format])]
   ==
 ++  enjs-status
