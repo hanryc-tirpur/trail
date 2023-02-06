@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { LoaderFunctionArgs, redirect, useLoaderData } from 'react-router-dom'
 
 import Urbit from '@urbit/http-api'
@@ -29,7 +29,13 @@ import type {
 } from './types/strava-types'
 
 type Step<T> = T & {
+  type: string,
   index: number,
+}
+
+type StepFactory<T, K> = {
+  description: string,
+  create: ({}: K) => Step<T>,
 }
 
 type Steps = Step<CreateStravaAppInputs> & { index: 0 }
@@ -37,9 +43,57 @@ type Steps = Step<CreateStravaAppInputs> & { index: 0 }
   | Step<StravaAuthorizationInputs> & { index: 2 }
   | Step<ConnectStravaInputs> & { index: 3 }
 
+type DataResult = {
+  isSuccessful: boolean,
+  data?: any,
+}
+
+
 const api = new Urbit('', '', window.desk)
 api.ship = window.ship
 
+const createStravaAppFactory: StepFactory<CreateStravaAppInputs & { index: 0 }, void> = {
+  description: 'Create Strava App', 
+  create: () => ({
+    index: 0,
+    type: 'CreateStravaApp',
+    getData: () => Promise.resolve(),
+  })
+}
+
+const enterClientInfoFactory: StepFactory<StravaClientInfoEntryInputs & { index: 1 }, void>  = {
+  description: 'Enter Strava Client Info', 
+  create: () => ({
+    index: 1,
+    type: 'StravaClientInfoEntry',
+  })
+}
+
+const requestAuthorizationFactory: StepFactory<StravaAuthorizationInputs & { index: 2 }, StravaClientInfo>  = {
+  description: 'Request Strava Authorization',
+  create: (clientInfo: StravaClientInfo) => ({
+    index: 2,
+    type: 'StravaAuthorization',
+    getData: () => Promise.resolve(),
+    ... clientInfo,
+  })
+}
+
+const connectFactory: StepFactory<ConnectStravaInputs & { index: 3 }, string>  = {
+  description: 'Connect',
+  create: (code) => ({
+    index: 3,
+    type: 'ConnectStrava',
+    code,
+  })
+}
+
+const stepFactories = [
+  createStravaAppFactory,
+  enterClientInfoFactory,
+  requestAuthorizationFactory,
+  connectFactory,
+]
 
 export async function loader({ request }: LoaderFunctionArgs): Promise<Response | Steps> {
   const { payload } = await api.scry<StravaConnectionStatusResponse>({
@@ -57,99 +111,63 @@ export async function loader({ request }: LoaderFunctionArgs): Promise<Response 
   })
 
   if(!hasClientInfo) {
-    return {
-      index: 0,
-      type: 'CreateStravaApp',
-    }
+    return createStravaAppFactory.create()
   }
   
   const url = new URL(request.url)
   const code = url.searchParams.get('code')
 
-  if(!code) {
-    return {
-      index: 2,
-      type: 'StravaAuthorization',
-      ... clientInfo,
-    }
-  }
-
-  return {
-    index: 3,
-    type: 'ConnectStrava',
-    ... clientInfo,
-    code,
-  }
+  return !code
+    ? requestAuthorizationFactory.create(clientInfo)
+    : connectFactory.create(code)
 }
-
-const steps = ['Create Strava App', 'Enter Strava Client Info', 'Request Strava Authorization', 'Connect']
 
 export default function Connect() {
   // @ts-ignore useLoaderData does not return typed data
-  const activeStepItem: Steps = useLoaderData()
-  const [activeStep, setActiveStep] = React.useState<number>(activeStepItem.index)
-  const [skipped, setSkipped] = React.useState(new Set<number>())
+  const initialStep: Steps = useLoaderData()
+  const [activeStep, setActiveStep] = React.useState(initialStep)
+  const [nextIsLoading, setNextIsLoading] = useState(false)
 
-  const isStepOptional = (step: number) => {
-    return false
-    // return step === 1
+  let getNextData = (): Promise<DataResult> => Promise.resolve({ isSuccessful: true })
+  // @ts-ignore useLoaderData does not return typed data
+  const onNext = (fn) => {
+    getNextData = fn
   }
 
-  const isStepSkipped = (step: number) => {
-    return skipped.has(step)
-  }
+  const handleNext = async () => {
+    setNextIsLoading(true)
+    const dataResult = await getNextData()
+    setNextIsLoading(false)
 
-  const handleNext = () => {
-    let newSkipped = skipped
-    if (isStepSkipped(activeStep)) {
-      newSkipped = new Set(newSkipped.values())
-      newSkipped.delete(activeStep)
+    console.log(dataResult)
+    if(dataResult.isSuccessful) {
+      setActiveStep(prev => {
+        const f = stepFactories[prev.index + 1]
+        // @ts-ignore useLoaderData does not return typed data
+        const nextStep = f.create(dataResult.data)
+        return nextStep
+      })
     }
-
-    setActiveStep((prevActiveStep) => prevActiveStep + 1)
-    setSkipped(newSkipped)
   }
 
   const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1)
-  }
-
-  const handleSkip = () => {
-    if (!isStepOptional(activeStep)) {
-      // You probably want to guard against something like this,
-      // it should never occur unless someone's actively trying to break something.
-      throw new Error("You can't skip a step that isn't optional.")
-    }
-
-    setActiveStep((prevActiveStep) => prevActiveStep + 1)
-    setSkipped((prevSkipped) => {
-      const newSkipped = new Set(prevSkipped.values())
-      newSkipped.add(activeStep)
-      return newSkipped
-    })
+    // @ts-ignore useLoaderData does not return typed data
+    setActiveStep((currentActiveStep) => stepFactories[currentActiveStep.index - 1].create(prevData))
   }
 
   const handleReset = () => {
-    setActiveStep(0)
+    setActiveStep(createStravaAppFactory.create())
   }
 
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-      <Stepper activeStep={activeStep}>
-        {steps.map((label, index) => {
+      <Stepper activeStep={activeStep.index}>
+        {stepFactories.map(f => f.description).map((label, index) => {
           const stepProps: { completed?: boolean } = {}
           const labelProps: {
             optional?: React.ReactNode
           } = {}
-          if (isStepOptional(index)) {
-            labelProps.optional = (
-              <Typography variant="caption">Optional</Typography>
-            )
-          }
-          if (isStepSkipped(index)) {
-            stepProps.completed = false
-          }
           return (
             <Step key={label} {...stepProps}>
               <StepLabel {...labelProps}>{label}</StepLabel>
@@ -157,7 +175,7 @@ export default function Connect() {
           )
         })}
       </Stepper>
-      {activeStep === steps.length ? (
+      {activeStep.index === stepFactories.length ? (
         <React.Fragment>
           <Typography sx={{ mt: 2, mb: 1 }}>
             All steps completed - you&aposre finished
@@ -170,32 +188,27 @@ export default function Connect() {
       ) : (
         <React.Fragment>
           <Box sx={{ flexGrow: 1, padding: '25px' }}>
-          {activeStepItem.index === 3 
-            ? <ConnectStrava {... activeStepItem} />
-            : activeStepItem.index === 2
-              ? <StravaAuthorization {... activeStepItem} />
-              : activeStepItem.index === 1
-                ? <StravaClientInfoEntry />
+          {activeStep.index === 3 
+            ? <ConnectStrava {... activeStep} />
+            : activeStep.index === 2
+              ? <StravaAuthorization {... activeStep} />
+              : activeStep.index === 1
+                ? <StravaClientInfoEntry onNext={onNext} />
                 : <CreateStravaApp />
           }
           </Box>
           <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
             <Button
               color="inherit"
-              disabled={activeStep === 0}
+              disabled={activeStep.index === 0}
               onClick={handleBack}
               sx={{ mr: 1 }}
             >
               Back
             </Button>
             <Box sx={{ flex: '1 1 auto' }} />
-            {isStepOptional(activeStep) && (
-              <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
-                Skip
-              </Button>
-            )}
-            <Button onClick={handleNext} disabled={activeStep === 2}>
-              {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+            <Button onClick={handleNext} disabled={nextIsLoading}>
+              {activeStep.index === stepFactories.length - 1 ? 'Finish' : 'Next'}
             </Button>
           </Box>
         </React.Fragment>

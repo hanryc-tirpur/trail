@@ -5,10 +5,9 @@ import Urbit from '@urbit/http-api'
 import * as yup from "yup"
 
 import Typography from '@mui/material/Typography'
-import { StravaClientInfo } from '../types/strava-types'
 
 
-export interface Inputs extends StravaClientInfo {
+export interface Inputs {
   type: 'ConnectStrava'
   code: string,
 }
@@ -17,13 +16,11 @@ const api = new Urbit('', '', window.desk)
 api.ship = window.ship
 
 const schema = yup.object({
-  client_id: yup.number().positive().integer().required(),
-  client_secret: yup.string().required(),
   code: yup.string().required(),
 })
 
 
-export default function ConnectStrava({ client_id, client_secret, code }: Inputs) {
+export default function ConnectStrava({ code }: Inputs) {
   const { register, handleSubmit, watch, formState: { errors } } = useForm<Inputs>({
     resolver: yupResolver(schema)
   })
@@ -34,8 +31,6 @@ export default function ConnectStrava({ client_id, client_secret, code }: Inputs
       mark: 'strava-action',
       json: {
         'complete-connection': {
-          'client-id': data.client_id,
-          'client-secret': data.client_secret,
           code: data.code,
         }
       }
@@ -48,13 +43,6 @@ export default function ConnectStrava({ client_id, client_secret, code }: Inputs
         Connect
       </Typography>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <input type="submit" />
-        {errors.client_id && <span>{errors.client_id.message}</span>}
-        {errors.client_secret && <span>{errors.client_secret.message}</span>}
-        {errors.code && <span>{errors.code.message}</span>}
-        
-        <input type="hidden" {...register('client_id')} defaultValue={client_id} />
-        <input type="hidden" {...register('client_secret')} defaultValue={client_secret} />
         <input type="hidden" {...register('code')} defaultValue={code} />
       </form>
     </div>
