@@ -41,6 +41,7 @@ export default function StravaClientInfoEntry({ onNext }: any) {
         }
       }
     })
+    return { isSuccessful: true, data }
   })
 
   return (

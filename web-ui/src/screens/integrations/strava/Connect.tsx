@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { LoaderFunctionArgs, redirect, useLoaderData } from 'react-router-dom'
+import { LoaderFunctionArgs, redirect, useLoaderData, useNavigate } from 'react-router-dom'
 
 import Urbit from '@urbit/http-api'
 
@@ -46,6 +46,7 @@ type Steps = Step<CreateStravaAppInputs> & { index: 0 }
 type DataResult = {
   isSuccessful: boolean,
   data?: any,
+  navigate?: string,
 }
 
 
@@ -127,6 +128,7 @@ export default function Connect() {
   const initialStep: Steps = useLoaderData()
   const [activeStep, setActiveStep] = React.useState(initialStep)
   const [nextIsLoading, setNextIsLoading] = useState(false)
+  const navigate = useNavigate()
 
   let getNextData = (): Promise<DataResult> => Promise.resolve({ isSuccessful: true })
   // @ts-ignore useLoaderData does not return typed data
@@ -139,7 +141,10 @@ export default function Connect() {
     const dataResult = await getNextData()
     setNextIsLoading(false)
 
-    console.log(dataResult)
+    if(dataResult.navigate) {
+      return window.location.href = dataResult.navigate
+    }
+
     if(dataResult.isSuccessful) {
       setActiveStep(prev => {
         const f = stepFactories[prev.index + 1]
@@ -189,9 +194,9 @@ export default function Connect() {
         <React.Fragment>
           <Box sx={{ flexGrow: 1, padding: '25px' }}>
           {activeStep.index === 3 
-            ? <ConnectStrava {... activeStep} />
+            ? <ConnectStrava {... activeStep} onNext={onNext} />
             : activeStep.index === 2
-              ? <StravaAuthorization {... activeStep} />
+              ? <StravaAuthorization {... activeStep } onNext={onNext} />
               : activeStep.index === 1
                 ? <StravaClientInfoEntry onNext={onNext} />
                 : <CreateStravaApp />

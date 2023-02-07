@@ -35,7 +35,7 @@
   %.  jon
   %-  of
   :~  
-    [%complete-connection code+so]
+    [%complete-connection (ot ~[code+so])]
     [%save-client-info (ot ~[client-id+ni client-secret+so])]
     [%sync-all (ot ~[until+ni:dejs-soft:format])]
   ==

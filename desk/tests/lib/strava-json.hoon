@@ -81,13 +81,30 @@
         ==
     !>  (dejs-activity strava-activity-json)
   ==
+++  test-dejs-save-client-info
+  =/  strava-action-json  %-  need  %-  de-json:html
+  '''
+  {
+    "save-client-info": {
+      "client-id": 8675309,
+      "client-secret": "f0dc76c22139ab22618ddfb498be1283254612b1"
+    }
+  }
+  '''
+  ;:  weld
+  %+  expect-eq
+    !>  :*
+          %save-client-info
+          8.675.309
+          'f0dc76c22139ab22618ddfb498be1283254612b1'
+        ==
+    !>  (dejs-action strava-action-json)
+  ==
 ++  test-dejs-complete-connection
   =/  strava-action-json  %-  need  %-  de-json:html
   '''
   {
     "complete-connection": {
-      "client-id": 8675309,
-      "client-secret": "f0dc76c22139ab22618ddfb498be1283254612b1",
       "code": "0x7348dedce172a44a47921f3ca8e3b2607e1177ee29e8c4fdf045638bb2097af6"
     }
   }
@@ -96,8 +113,6 @@
   %+  expect-eq
     !>  :*
           %complete-connection
-          8.675.309
-          'f0dc76c22139ab22618ddfb498be1283254612b1'
           '0x7348dedce172a44a47921f3ca8e3b2607e1177ee29e8c4fdf045638bb2097af6'
         ==
     !>  (dejs-action strava-action-json)

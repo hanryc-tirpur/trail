@@ -23,15 +23,23 @@ interface AuthorizationValues extends Record<string, string>, StravaClientInfo {
   scope: string,
 }
 
-export default function StravaAuthorization({ client_id, client_secret }: Inputs) {
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<AuthorizationValues>({
+export default function StravaAuthorization({ client_id, client_secret, onNext }: Inputs & { onNext: any }) {
+  const { getValues, register, trigger, formState: { errors } } = useForm<AuthorizationValues>({
     resolver: yupResolver(schema)
   })
-  const onSubmit: SubmitHandler<AuthorizationValues> = (data: Record<string, string>, evt) => {
-    const url = new URL(`${evt?.target.action}?${new URLSearchParams(data).toString()}`)
-    location.href = url.toString()
-    console.log(data, evt?.target.action)
-  }
+
+  onNext(async () => {
+    const isValid = await trigger()
+    if(!isValid) return { isSuccessful: false }
+    const data = getValues()
+    const action = 'https://www.strava.com/oauth/authorize'
+    const url = new URL(`${action}?${new URLSearchParams(data).toString()}`)
+    
+    return {
+      isSuccessful: true,
+      navigate: url.toString(),
+    }
+  })
 
   return (
     <>
@@ -41,7 +49,7 @@ export default function StravaAuthorization({ client_id, client_secret }: Inputs
         authorize the %trail app to read your activity data. After %trail is authorized, you will be
         brought back to the app to complete the connection process.
       </Typography>
-      <form encType="form/url-encoded" onSubmit={handleSubmit(onSubmit)} action="https://www.strava.com/oauth/authorize">
+      <form encType="form/url-encoded" action="https://www.strava.com/oauth/authorize">
         <input type="hidden" {...register('client_id')} defaultValue={`${client_id}`} />
         <input type="hidden" {...register('client_secret')} defaultValue={`${client_secret}`} />
         <input type="hidden" {...register('redirect_uri')} defaultValue={`${location.href}`} />
