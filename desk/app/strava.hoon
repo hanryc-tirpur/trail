@@ -261,7 +261,14 @@
       [%pass /strava/add/activity %agent [our.bowl %trail] %poke %trail-action !>(hmm)]
   --
 ::
-++  on-watch  on-watch:def
+++  on-watch
+  |=  =path
+  ^-  (quip card _this)
+  ?>  (team:title our.bowl src.bowl)
+  ?+  path  (on-watch:def path)
+    [%updates ~]  `this
+  ==
+::
 ++  on-leave  on-leave:def
 ++  on-arvo   on-arvo:def
 ++  on-fail   on-fail:def

@@ -67,6 +67,19 @@
               ['client_secret' s+client-secret.c-args]
       ==  ==
   ==
+++  enjs-update
+  =,  enjs:format
+  |=  update=strava-update
+  ^-  json
+  ?-    -.update
+      %strava-connected
+      %-  pairs
+        :~  ['type' s+'stravaConnected']
+          :-  'payload' 
+          %-  pairs
+          :~  ['isConnected' b+is-connected.update]
+      ==  ==
+  ==
 ++  enjs-api-sync-status
   =,  enjs:format
   |=  status=api-sync-status

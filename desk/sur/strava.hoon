@@ -57,6 +57,9 @@
       [%sync-activities sync=sync-params]
       [%sync-all until=(unit @ud)]
   ==
++$  strava-update
+  $%  [%strava-connected is-connected=?]
+  ==
 +$  thread-response
   $%  [%initial-authorization-response auth=refresh-response:oauth2 client-id=@ud client-secret=@t]
       [%refresh-authorization-response auth=refresh-response:oauth2 action=strava-action]

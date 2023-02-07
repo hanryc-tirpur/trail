@@ -180,4 +180,20 @@
     !>  (skip (trip expected-json) remove-whitespace)
     !>  (en-json:html (enjs-status [%strava-connection-status %.y %unsynced '']))
   ==
+  ::
+  ++  test-enjs-update-strava-connected
+  =/  expected-json
+  '''
+  {
+    "type": "stravaConnected",
+    "payload": {
+      "isConnected": true
+    }
+  }
+  '''
+  ;:  weld
+  %+  expect-eq
+    !>  (skip (trip expected-json) remove-whitespace)
+    !>  (en-json:html (enjs-update [%strava-connected %.y]))
+  ==
 --

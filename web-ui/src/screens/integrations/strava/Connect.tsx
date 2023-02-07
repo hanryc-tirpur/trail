@@ -102,6 +102,7 @@ export async function loader({ request }: LoaderFunctionArgs): Promise<Response 
     path: '/status/strava-status'
   })
   
+  console.log('payload', payload)
   if(payload.isConnected) {
     return redirect('/apps/trail/integrations/strava')
   }
