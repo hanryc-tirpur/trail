@@ -80,11 +80,13 @@ const requestAuthorizationFactory: StepFactory<StravaAuthorizationInputs & { ind
   })
 }
 
-const connectFactory: StepFactory<ConnectStravaInputs & { index: 3 }, string>  = {
+const connectFactory: StepFactory<ConnectStravaInputs & { index: 3 }, StravaClientInfo & { code: string}>  = {
   description: 'Connect',
-  create: (code) => ({
+  create: ({ client_id, client_secret, code }) => ({
     index: 3,
     type: 'ConnectStrava',
+    client_id,
+    client_secret,
     code,
   })
 }
@@ -121,7 +123,7 @@ export async function loader({ request }: LoaderFunctionArgs): Promise<Response 
 
   return !code
     ? requestAuthorizationFactory.create(clientInfo)
-    : connectFactory.create(code)
+    : connectFactory.create({... clientInfo, code})
 }
 
 export default function Connect() {
@@ -135,6 +137,12 @@ export default function Connect() {
   // @ts-ignore useLoaderData does not return typed data
   const onNext = (fn) => {
     getNextData = fn
+  }
+
+  let getPreviousData = () => null
+  // @ts-ignore useLoaderData does not return typed data
+  const onPrev = (fn) => {
+    getPreviousData = fn
   }
 
   const handleNext = async () => {
@@ -158,7 +166,7 @@ export default function Connect() {
 
   const handleBack = () => {
     // @ts-ignore useLoaderData does not return typed data
-    setActiveStep((currentActiveStep) => stepFactories[currentActiveStep.index - 1].create(prevData))
+    setActiveStep((currentActiveStep) => stepFactories[currentActiveStep.index - 1].create(getPreviousData()))
   }
 
   const handleReset = () => {
@@ -195,7 +203,7 @@ export default function Connect() {
         <React.Fragment>
           <Box sx={{ flexGrow: 1, padding: '25px' }}>
           {activeStep.index === 3 
-            ? <ConnectStrava {... activeStep} onNext={onNext} />
+            ? <ConnectStrava {... activeStep} onNext={onNext} onPrev={onPrev} />
             : activeStep.index === 2
               ? <StravaAuthorization {... activeStep } onNext={onNext} />
               : activeStep.index === 1

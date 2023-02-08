@@ -6,9 +6,10 @@ import Urbit from '@urbit/http-api'
 import * as yup from "yup"
 
 import Typography from '@mui/material/Typography'
+import { StravaClientInfo } from '../types/strava-types'
 
 
-export interface Inputs {
+export interface Inputs extends StravaClientInfo {
   type: 'ConnectStrava'
   code: string,
 }
@@ -21,7 +22,7 @@ const schema = yup.object({
 })
 
 
-export default function ConnectStrava({ code, onNext }: Inputs & { onNext: any }) {
+export default function ConnectStrava({ client_id, client_secret, code, onNext, onPrev }: Inputs & { onNext: any, onPrev: any, }) {
   const { getValues, register, trigger, formState: { errors } } = useForm<Inputs>({
     resolver: yupResolver(schema)
   })
@@ -56,6 +57,8 @@ export default function ConnectStrava({ code, onNext }: Inputs & { onNext: any }
       })
     })
   })
+
+  onPrev(() => ({ client_id, client_secret }))
 
   return (
     <>
