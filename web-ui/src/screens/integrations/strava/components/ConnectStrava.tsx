@@ -31,21 +31,30 @@ export default function ConnectStrava({ code, onNext }: Inputs & { onNext: any }
     if(!isValid) return { isSuccessful: false }
     const data = getValues()
     
-    const pokeResult = await api.poke({
-      app: 'strava',
-      mark: 'strava-action',
-      json: {
-        'complete-connection': {
-          code: data.code,
-        }
-      }
-    })
 
-    const url = new URL(window.location.href)
-    return {
-      isSuccessful: true,
-      navigate: `${url.origin}/apps/trail/integrations/strava`,
-    }
+    return new Promise((resolve, reject) => {
+      api.subscribe({
+        app: 'strava',
+        path: '/updates',
+        event: evt => {
+          const url = new URL(window.location.href)
+          resolve({
+            isSuccessful: true,
+            navigate: `${url.origin}/apps/trail/integrations/strava`,
+          })
+        },
+        err: () => reject('Could not subscribe to strava app updates'),
+      })
+      api.poke({
+        app: 'strava',
+        mark: 'strava-action',
+        json: {
+          'complete-connection': {
+            code: data.code,
+          }
+        }
+      })
+    })
   })
 
   return (

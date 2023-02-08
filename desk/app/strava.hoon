@@ -219,7 +219,8 @@
         =/  res  !<(thread-response q.cage.sign)
         ?-    -.res
             %initial-authorization-response
-          `this(state state(is-connected %.y, auth auth.res, con-args `[client-id.res client-secret.res]))
+          :_  this(state state(is-connected %.y, auth auth.res, con-args `[client-id.res client-secret.res]))
+          [%give %fact ~[/updates] strava-update+!>([%strava-connected %.y])]~
         ::
             %refresh-authorization-response
           :_  this(state state(auth auth.res))
