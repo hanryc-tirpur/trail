@@ -6,7 +6,6 @@
     ==
 +$  state-0  [%0 =settings =activities]
 +$  card  card:agent:gall
-++  activities-accessor  ((on id activity) gth)
 ++  add-km  ~(add-distance measurement %km)
 ++  to-km  ~(calculate-distance geo %km)
 ++  to-miles  ~(calculate-distance geo %mile)
@@ -49,7 +48,7 @@
         %save-settings
       state(settings [unit.act])
         %sync-activity
-      ?<  (has:activities-accessor activities.state id.act)
+      ?<  (~(has by activities.state) id.act)
       ?~  full-path.act  !!
       ~&  (to-segment i.full-path.act)
       =/  segments=(list segment)  (turn full-path.act to-segment)
@@ -62,14 +61,13 @@
         (reel segments |=([s=segment sum=@] (add sum elapsed-time.s)))
       ==
       ~&  to-add
-      state(activities (put:activities-accessor activities id.act `activity`to-add))
+      state(activities (~(put by activities) id.act `activity`to-add))
       ::
         %save-outside-activity
       =/  strava  activity.act
-      ?<  (has:activities-accessor activities.state id.activity.act)
+      ?<  (~(has by activities.state) id.activity.act)
       ?~  map-polyline.strava  !!
-      =/  res  (put:activities-accessor activities.state id.strava strava) 
-      state(activities (put:activities-accessor activities.state id.strava strava))
+      state(activities (~(put by activities.state) id.strava strava))
     ==
     ++  to-segment
       |=  readings=(list location-reading)
@@ -110,7 +108,7 @@
       [%x %activities *]
     ?+    t.t.path  (on-peek:def path)
         [%all ~]
-      =/  matches=(list [@ activity])  (tap:activities-accessor activities)
+      =/  matches=(list [@ activity])  ~(tap by activities)
       :^  ~  ~  %trail-update
       !>  ^-  update
       :: [%activities (turn matches |=(a=[@ activity] [id.a total-distance.a total-elapsed-time.a]))]
@@ -119,7 +117,7 @@
         [%before @ @ ~]
       =/  before=@  (rash i.t.t.t.path dem)
       =/  max=@  (rash i.t.t.t.t.path dem)
-      =/  matches=(list [@ activity])  (tab:activities-accessor activities `before max)
+      =/  matches=(list [@ activity])  ~(tap by activities)
       :^  ~  ~  %trail-update
       !>  ^-  update
       :: [%activities (turn matches |=(a=[@ activity] [id.a total-distance.a total-elapsed-time.a]))]
@@ -130,7 +128,7 @@
         =+  (rash i.t.t.t.path dem)
         ?:(=(0 -) - (sub - 1))
       =/  end=@  (add 1 (rash i.t.t.t.t.path dem))
-      =/  matches=(list [@ activity])  (tap:activities-accessor (lot:activities-accessor activities `end `start))
+      =/  matches=(list [@ activity])  ~(tap by activities)
       :^  ~  ~  %trail-update
       !>  ^-  update
       :: [%activities (turn matches |=(a=[@ activity] [id.a total-distance.a total-elapsed-time.a]))]

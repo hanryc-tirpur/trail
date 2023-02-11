@@ -44,14 +44,10 @@
       =distance
       elapsed-time=@
   ==
-+$  activities  ((mop id activity) gth)
++$  activities  (map id activity)
 +$  action
   $%  [%sync-activity =id =activity-type full-path=(list (list location-reading))]
-      :: [%stop-activity =id path=(list location-reading)]
-      :: [%end-activity =id path=(list location-reading)]
-      :: [%delete-activity =id]
       [%save-settings unit=distance-unit]
-      :: [%save-locations =id path=(list location-reading)]
       [%save-outside-activity activity=strava-activity]
   ==
 +$  update

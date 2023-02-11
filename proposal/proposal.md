@@ -9,76 +9,36 @@ When on a laptop reviewing previous exercises, a user would be using grid (brows
 
 ## Gall app API
 ## Milestones
-- **Milestone 1**: Gall app backend
+- **Milestone 1**: Gall app backend with basic Grid UI
   - **Pokes**
     - **%sync-activity**: Syncs full activity data, including activity-type and path. 
-    - **%delete-activity**: Deletes an activity.
     - **%save-settings**: Saves settings, including whether distance should be measured in miles or km
-
   - **Peeks**
     - View details of a previously completed activity
-  - **/sur**
-  ```hoon
-  |%
-  +$  id  @
-  +$  timestamp  @
-  +$  activity-type  ?(%bike %walk %run)
-  +$  distance-unit  ?(%mile %km)
-  +$  settings  [unit=distance-unit]
-  +$  location
-    $:  =timestamp
-        lattitude=@rs
-        longitude=@rs
-        altitude=@rs
-        heading=@rs
-    ==
-  +$  activity
-    $:  =id
-        =activity-type
-        segments=(list segment)
-        total-distance=@rs
-        total-elapsed-time=@rs
-    ==
-  +$  activity-summary  [=id total-distance=@rs total-elapsed-time=@rs]
-  +$  segment
-    $:  start-time=timestamp
-        end-time=(unit timestamp)
-        path=(list location)
-        distance=@rs
-        elapsed-time=@rs
-    ==
-  +$  activities  ((mop id activity) gth)
-  +$  action
-    $%  [%sync-activity =id =activity-type path=(list location)]
-        :: [%stop-activity =id path=(list location)]
-        :: [%end-activity =id path=(list location)]
-        :: [%delete-activity =id]
-        [%save-settings unit=distance-unit]
-        :: [%save-locations =id path=(list location)]
-    ==
-  +$  update
-    $%  [%activities list=(list activity-summary)]
-        [%activity =activity]
-    ==
-  --
-  ```
-- **Milestone 2**: Basic outdoor workout tracking on iPhone
-  - Choose between metric and imperial unit systems
-  - Live tracking of an outdoor workout
-  - Path on map updates as user moves
-  - Displays current pace, total distance, average speed
-  - View summary of previously completed workouts
-  - View details of a previously completed workout
-- **Milestone 3**: Grid application developed in React
-  - View summary of previously completed workouts
-  - View details of a previously completed workout
-  - Edit workout
-    - Can modify the time of the workout to remove a time period at the end of a workout
-- **Milestone 4**: Ingest data from Strava API
+  - **Grid**
+    - View summary of previously completed activities
+- **Milestone 2**: Ingest data from Strava API
   - Create gall agent
     - Parse Strava data and save to %trail agent
   - Grid UI
     - Ability to enter Strava API access token
+- **Milestone 3**: Basic outdoor activity tracking on iPhone
+  - **Gall agent**
+    - **Pokes**
+      - **%delete-activity**: Deletes an activity.
+  - Choose between metric and imperial unit systems
+  - Live tracking of an outdoor activity
+  - Path on map updates as user moves
+  - Displays current pace, total distance, average speed
+  - View summary of previously completed activity
+  - View details of a previously completed activity
+- **Milestone 4**: Grid application developed in React
+  - View details of a previously completed activity
+  - Display distances in either metric or imperial units
+  - View summary data
+    - How much time, how far in the last week, month, year, etc.
+  - Edit activitiy
+    - Can modify the time of the workout to remove a time period at the end of a workout
 - **Milestone 5**: Ingest data from common activity file types
   - Create gall agent
     - Parse .gpx files
