@@ -80,7 +80,7 @@
         timestamp.prev
         `(list location-reading)`~[prev]
         [.~0 %km]
-        0
+        (mul 0 ~s1)
       ==
       |-
       ?~  remaining  seg

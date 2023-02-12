@@ -34,7 +34,7 @@
     strava-activity
   ==
 +$  activity-summary
-  $%  [%standard =id total-distance=distance total-elapsed-time=@]
+  $%  [%standard =id total-distance=distance total-elapsed-time=@dr]
       strava-activity
   ==
 +$  segment
@@ -42,7 +42,7 @@
       end-time=timestamp
       path=(list location-reading)
       =distance
-      elapsed-time=@
+      elapsed-time=@dr
   ==
 +$  activities  (map id activity)
 +$  action
