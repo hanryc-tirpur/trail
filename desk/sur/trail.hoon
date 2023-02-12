@@ -1,10 +1,10 @@
 /-  *geo, *measurement
 
 |%
-+$  id  @
++$  id  @da
 +$  activity-type  ?(%bike %walk %run %ride %crossfit)
 +$  settings  [unit=distance-unit]
-+$  timestamp  @
++$  timestamp  @da
 +$  location-reading
   $:  =timestamp
       =location

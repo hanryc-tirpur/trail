@@ -13,7 +13,7 @@
   =/  props  ~(got by ((om |=(j=json j)) jon))
   =/  map-props  ~(got by ((om |=(j=json j)) (props 'map')))
   :*  
-      (unm:chrono:userlib (year (need (convert-to-date (sa (props 'start_date'))))))
+      (year (need (convert-to-date (sa (props 'start_date')))))
       (extract *activity-type:trail (crip (cass (sa (props 'sport_type')))))
       (sa (props 'name'))
       (ne (props 'distance'))
@@ -37,7 +37,7 @@
   :~  
     [%complete-connection (ot ~[code+so])]
     [%save-client-info (ot ~[client-id+ni client-secret+so])]
-    [%sync-all (ot ~[until+ni:dejs-soft:format])]
+    [%sync-all (ot ~[until+di:dejs-soft:format])]
   ==
 ++  enjs-status
   =,  enjs:format
@@ -93,7 +93,7 @@
       %-  pairs
       :~  ['status' s+-.status]
           ['syncType' s+-.fully]
-          ['until' (numb until.fully)]
+          ['until' (numb (unt:chrono:userlib until.fully))]
       ==
     ==
       %syncing

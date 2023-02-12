@@ -31,7 +31,7 @@
     ?-    -.a
         %standard
       %-  pairs
-      :~  ['id' (numb id.a)]
+      :~  ['id' (numb (unm:chrono:userlib id.a))]
           ['totalElapsedTime' (numb total-elapsed-time.a)]
           :-  'totalDistance'
           %-  pairs
@@ -40,7 +40,7 @@
       ==  ==
         %strava
       %-  pairs
-      :~  ['id' (numb id.a)]
+      :~  ['id' (numb (unm:chrono:userlib id.a))]
           ['activityType' s+activity-type.a]
           ['name' (tape name.a)]
           ['timeMoving' (numb time-moving.a)]

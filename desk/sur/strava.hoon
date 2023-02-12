@@ -1,17 +1,17 @@
 /-  *trail, oauth2
 
 |%
-+$  id  @
++$  id  @da
 +$  timestamp  @
 +$  map-data  [polyline=tape]
 +$  connection-args  $:
       client-id=@ud
       client-secret=@t
     ==
-+$  sync-params  [after=(unit @ud) before=(unit @ud) page=@ud]
++$  sync-params  [after=(unit @da) before=(unit @da) page=@ud]
 +$  synced-type
-  $%  [%fully until=@ud]
-      [%ranged after=@ud before=@ud]
+  $%  [%fully until=@da]
+      [%ranged after=@da before=@da]
   ==
 +$  api-sync-status
   $%  [%unsynced m=@t] :: TODO: Make m(sg) a unit
@@ -25,7 +25,7 @@
       token-refresh=tape
     ==
 +$  activity-summary
-  $:  id=@ud
+  $:  id=@da
       =activity-type
       name=tape
       total-distance-m=@rd
@@ -47,15 +47,15 @@
 +$  sync-activity-request  [url=tape access-token=@t action=strava-action]
 +$  api-query-args
   $:
-    after=(unit @ud)
-    before=(unit @ud)
+    after=(unit @da)
+    before=(unit @da)
     page=@ud
   ==
 +$  strava-action
   $%  [%save-client-info client-id=@ud client-secret=@t]
       [%complete-connection strava-code=@t]
       [%sync-activities sync=sync-params]
-      [%sync-all until=(unit @ud)]
+      [%sync-all until=(unit @da)]
   ==
 +$  strava-update
   $%  [%strava-connected is-connected=?]

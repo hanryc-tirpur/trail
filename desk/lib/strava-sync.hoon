@@ -14,9 +14,9 @@
   ==
   ::
     ++  params-for-sync-all
-    |=  [until=(unit @ud) status=api-sync-status]
+    |=  [until=(unit @da) status=api-sync-status]
     ^-  (list tape)
-    =/  until-s  (fall until (unt:chrono:userlib now))
+    =/  until-s  (unt:chrono:userlib (fall until now))
     =/  params=(list tape)  ~
     ?-    -.status
         %syncing
@@ -27,7 +27,7 @@
         ?-  -.type.status
           %ranged  !!
           %fully
-        (snoc params "after={(to-tape-without-decimals until.type.status)}")
+        (snoc params "after={(to-tape-without-decimals (unt:chrono:userlib until.type.status))}")
         ==
       ::
         %unsynced

@@ -112,7 +112,7 @@
       :^  ~  ~  %trail-update
       !>  ^-  update
       :: [%activities (turn matches |=(a=[@ activity] [id.a total-distance.a total-elapsed-time.a]))]
-      [%activities (turn matches |=(a=[@ activity] +.a))]
+      [%activities (sort ~(val by activities) |=([a=activity b=activity] (gth id.a id.b)))]
     ::
         [%before @ @ ~]
       =/  before=@  (rash i.t.t.t.path dem)

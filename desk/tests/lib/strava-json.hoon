@@ -70,7 +70,7 @@
   ;:  weld
   %+  expect-eq
     !>  :*
-          1.671.316.123.000
+          ~2022.12.17..22.28.43
           %ride
           "Afternoon Ride"
           .~8211.0
@@ -122,7 +122,7 @@
   '''
   {
     "sync-all": {
-      "until": 1675134402
+      "until": 1676159502000
     }
   }
   '''
@@ -130,7 +130,7 @@
   %+  expect-eq
     !>  :*
           %sync-all
-          `1.675.134.402
+          `~2023.2.11..23.51.42
         ==
     !>  (dejs-action strava-action-json)
   ==
@@ -149,7 +149,7 @@
       "syncStatus": {
         "status": "synced",
         "syncType": "fully",
-        "until": 987654
+        "until": 1676159502
       },
       "isConnected": true
     }
@@ -158,7 +158,7 @@
   ;:  weld
   %+  expect-eq
     !>  (skip (trip expected-json) remove-whitespace)
-    !>  (en-json:html (enjs-status [%strava-connection-status %.y %synced %fully 987.654]))
+    !>  (en-json:html (enjs-status [%strava-connection-status %.y %synced %fully ~2023.2.11..23.51.42]))
   ==
   ::
   ++  test-enjs-status-strava-connection-status-fully-synced-to-json

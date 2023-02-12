@@ -250,7 +250,7 @@
         %save-outside-activity
         :*
           %strava
-          `@`id.act
+          id.act
           activity-type.act
           name.act
           [(div:rd total-distance-m.act .~1000) %km]

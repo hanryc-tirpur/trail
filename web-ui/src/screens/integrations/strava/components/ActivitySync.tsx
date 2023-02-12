@@ -22,7 +22,7 @@ const syncAll = async () => {
     mark: 'strava-action',
     json: {
       'sync-all': {
-        'until': Math.floor(Date.now() / 1000),
+        'until': Math.floor(Date.now()),
       }
     }
   })
