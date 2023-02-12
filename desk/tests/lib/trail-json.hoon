@@ -12,7 +12,7 @@
   {
     "activities": [
       {
-        "totalElapsedTime": 45678,
+        "totalElapsedTime": 3600,
         "id": 1676159502000,
         "totalDistance": {
           "val": 4.9455646421625,
@@ -22,7 +22,7 @@
     ]
   }
   '''
-  =/  summary-1=activity  [%standard ~2023.2.11..23.51.42 %walk ~ [.~4.945564642162535 %mile] 45.678]
+  =/  summary-1=activity  [%standard ~2023.2.11..23.51.42 %walk ~ [.~4.945564642162535 %mile] ~h1]
   ;:  weld
   %+  expect-eq
     !>  (skip (trip expected-json) remove-whitespace)

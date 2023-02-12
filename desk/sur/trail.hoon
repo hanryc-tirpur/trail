@@ -15,8 +15,8 @@
       =activity-type
       name=tape
       total-distance=distance
-      time-moving=@
-      time-elapsed=@
+      time-moving=@dr
+      time-elapsed=@dr
       map-polyline=tape
       strava-activity-id=@ud
   == 
@@ -26,7 +26,7 @@
       =activity-type
       segments=(list segment)
       total-distance=distance
-      total-elapsed-time=@
+      total-elapsed-time=@dr
   ==
 +$  activity
   $%

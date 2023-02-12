@@ -32,7 +32,7 @@
         %standard
       %-  pairs
       :~  ['id' (numb (unm:chrono:userlib id.a))]
-          ['totalElapsedTime' (numb total-elapsed-time.a)]
+          ['totalElapsedTime' (numb (div total-elapsed-time.a ~s1))]
           :-  'totalDistance'
           %-  pairs
           :~  ['val' (numb-rd val.total-distance.a)]
@@ -43,8 +43,8 @@
       :~  ['id' (numb (unm:chrono:userlib id.a))]
           ['activityType' s+activity-type.a]
           ['name' (tape name.a)]
-          ['timeMoving' (numb time-moving.a)]
-          ['timeElapsed' (numb time-elapsed.a)]
+          ['timeMoving' (numb (div time-moving.a ~s1))]
+          ['timeElapsed' (numb (div time-elapsed.a ~s1))]
           ['mapPolyline' (tape map-polyline.a)]
           ['strava-activity-id' (numb strava-activity-id.a)]
           :-  'totalDistance'

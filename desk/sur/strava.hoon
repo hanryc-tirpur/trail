@@ -29,8 +29,8 @@
       =activity-type
       name=tape
       total-distance-m=@rd
-      time-moving-s=@ud
-      time-elapsed-s=@ud
+      time-moving-s=@dr
+      time-elapsed-s=@dr
       map-polyline=tape
       strava-activity-id=@ud
   ==

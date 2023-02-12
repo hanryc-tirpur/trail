@@ -17,8 +17,8 @@
       (extract *activity-type:trail (crip (cass (sa (props 'sport_type')))))
       (sa (props 'name'))
       (ne (props 'distance'))
-      (ni (props 'moving_time'))
-      (ni (props 'elapsed_time'))
+      (mul ~s1 (ni (props 'moving_time')))
+      (mul ~s1 (ni (props 'elapsed_time')))
       (sa (map-props 'summary_polyline'))
       (ni (props 'id'))
   ==
