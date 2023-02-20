@@ -1,9 +1,9 @@
 :~  title+'Trail'
     info+'An outdoor activity tracker for Urbit'
     color+0x2e.4347
-    glob-http+['https://bootstrap.urbit.org/glob-0v5.hurm4.ejod5.ngg9h.iub9i.n1j7o.glob' 0v5.hurm4.ejod5.ngg9h.iub9i.n1j7o]
     base+'trail'
-    version+[0 0 1]
-    website+'https://github.com'
+    glob-http+['https://bootstrap.urbit.org/glob-0v5.hurm4.ejod5.ngg9h.iub9i.n1j7o.glob' 0v5.hurm4.ejod5.ngg9h.iub9i.n1j7o]
+    version+[0 1 0]
+    website+'https://github.com/hanryc-tirpur/trail'
     license+'MIT'
 ==

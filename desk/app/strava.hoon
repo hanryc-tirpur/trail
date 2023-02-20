@@ -23,8 +23,6 @@
 +*  this  .
     def           ~(. (default-agent this %|) bowl)
     io            ~(. agentio bowl)
-    strava-core   +>
-    sc            ~(. strava-core bowl)
 ++  on-init
   ^-  (quip card _this)
   =/  base  "https://www.strava.com"
@@ -178,19 +176,6 @@
       :^  ~  ~  %strava-status
       !>  ^-  strava-status
       [%strava-client-info con-args.state]
-    :: ?+    t.t.path  (on-peek:def path)
-    ::   [%access ~]
-    ::   =/  base-url  "https://www.strava.com/oauth/token"
-    ::   =/  client-id  (skip "{<client-id.con-args.state>}" match-period)
-    ::   =/  url-1  (weld base-url "?client_id={client-id}")
-    ::   =/  url-2  (weld url-1 "&client_secret={(trip client-secret.con-args.state)}")
-    ::   =/  url-3  (weld url-2 "&grant_type=refresh_token")
-    ::   =/  url-4  (weld url-3 "&refresh_token={(trip refresh-token.auth.state)}")
-    :: ``noun+!>(url-4)
-    ::   [%activities ~]
-    ::   =/  activities-url  "https://www.strava.com/api/v3/athlete/activities"
-    :: ``noun+!>(activities-url)
-    :: ==
     ==
   ==
 ::
