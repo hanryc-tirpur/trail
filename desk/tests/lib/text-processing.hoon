@@ -1,6 +1,6 @@
 /+  *test, *text-processing
 |%
-++  test-activity-summary-to-json
+++  test-convert-to-date
   =/  date-string  "2022-12-17T22:28:43Z" 
   ;:  weld
   %+  expect-eq
