@@ -5,7 +5,6 @@
 +$  activity-type  ?(%bike %walk %run %ride %crossfit)
 +$  settings  [unit=distance-unit]
 +$  timestamp  @da
-+$  booyah  @da
 +$  location-reading
   $:  =timestamp
       =location
@@ -45,7 +44,7 @@
   ==
 +$  activities  (map id activity)
 +$  action
-  $%  [%sync-activity =id =activity-type full-path=(list (list location-reading))]
+  $%  [%sync-activity =id =activity-type full-path=(list (lest location-reading))]
       [%save-settings unit=distance-unit]
       [%save-outside-activity activity=[%strava strava-activity]]
   ==

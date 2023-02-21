@@ -27,7 +27,6 @@
   |=  old-vase=vase
   ^-  (quip card _this)
   =/  loaded  !<(versioned-state old-vase)
-  ~&  [%previous-state loaded]
   `this(state loaded)
 ::
 ++  on-poke
@@ -50,7 +49,7 @@
         %sync-activity
       ?<  (~(has by activities.state) id.act)
       ?~  full-path.act  !!
-      ~&  (to-segment i.full-path.act)
+      :: ~&  (to-segment i.full-path.act)
       =/  segments=(list segment)  (turn full-path.act to-segment)
       =/  to-add  :*
         %standard
@@ -70,9 +69,8 @@
       state(activities (~(put by activities.state) id.strava strava))
     ==
     ++  to-segment
-      |=  readings=(list location-reading)
+      |=  readings=(lest location-reading)
       ^-  segment
-      ?~  readings  !!
       =/  prev  i.readings
       =/  remaining  t.readings
       =/  seg=segment  :*
