@@ -2,23 +2,19 @@
 ++  convert-to-date
   |=  maybe-date=tape
   ^-  (unit date)
+  =+  hepdem=;~(pfix hep dem)
+  =+  coldem=;~(pfix col dem)
   =/  parser  ;~  plug
-    dem
-    hep
-    dem
-    hep
-    dem
-    (just 'T')
-    dem
-    col
-    dem
-    col
-    dem
-    (just 'Z')
+    (stag %.y dem)
+    hepdem
+    hepdem
+    ;~(pfix (just 'T') dem)
+    coldem
+    coldem
+    (cold ~ (just 'Z'))
   ==
-  =/  result  (scan maybe-date parser)
-  =/  parsed  `date`[[%.y -.result] +>-.result +>+>-.result +>+>+>-.result +>+>+>+>-.result +>+>+>+>+>-.result ~]
-  `parsed
+  =/  result  (rust maybe-date parser)
+  `(unit date)`result
 ++  to-tape-without-decimals
   |=  num=@u
   (remove-decimals "{<num>}")
