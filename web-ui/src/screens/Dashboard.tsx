@@ -30,34 +30,14 @@ export interface ChargeUpdateDel {
 
 export async function loader(): Promise<ActivitySummariesInitial> {
   const scryAllActivities: Scry = { app: 'trail', path: '/activities/all', }
-  let summariesResponse = (await api.scry<ActivitySummariesInitial>(scryAllActivities));
-  summariesResponse = summariesResponse.activities?.length ? summariesResponse : {
-    activities: [{
-      name: 'Dummy Workout',
-      id: '23456',
-      totalElapsedTime: 787,
-      timeMoving: 787,
-      mapPolyline: 'e|e_GjkexOn@Jj@RP^LrMBfA@nAEZAXAlE@PDFJB\\?r@ChIEpADzDEH@HDd@^LDxA@v@ZXE\\QNEjG@RJBN@RAhDIjBqAvMqDja@w@zHyCv_@oA`NoAtKQrAMf@uDf\\a@|Cy@nFoAvHaBdJM^IHM@iG@yHE}IMgHAaTYy@G]Gw@Ws@c@q@o@UYU]cBaDKe@mC}EuAuByA_B_Au@QQiCwAm@Q{@S_C[wAEaG@}bA]iGBMBIFGJEPAzF?NCJIFIBMA]MgA_AWK}@CwAAOE_@[UBGGAQDa@HAJDDt@Qv@SRE@C?CKHDHcB@FAMAB@OFIDB@GXL?HIX@HJRTPLFN@zAAl@F\\Rj@f@^RZHd@CFGDMDg@?eAIyB',
-      totalDistance: {
-        val: 8.2110,
-        unit: DistanceUnit.KM,
-      }
-    }]
-  }
-  console.log('All activities', summariesResponse)
+  const summariesResponse = (await api.scry<ActivitySummariesInitial>(scryAllActivities));
   return { ...summariesResponse }
 }
 
-export default function Dashboard() {
-  // @ts-ignore ts is kinda annoying
-  const { activities } = useLoaderData()
-
-  console.log('Dashboard, baby!')
-
+function HasActivities({ activities }: { activities: ActivitySummary[]}) {
   return (
-    <Grid container spacing={3}>
     <ul>
-    {activities && activities.map((s: ActivitySummary) => {
+    {activities.map((s: ActivitySummary) => {
       return (
         <li key={s.id} className="activity-summary-container">
           <ActivitySummaryDisplay {... s} />
@@ -65,6 +45,24 @@ export default function Dashboard() {
       )
     })}
     </ul>
+  )
+}
+
+export default function Dashboard() {
+  // @ts-ignore ts is kinda annoying
+  const { activities } = useLoaderData()
+
+  return (
+    <Grid container spacing={3}>
+      { activities && activities.length
+        ? <HasActivities activities={activities} />
+        : <div>
+          You do not currently have any activities.
+          
+          For now, you can either use the Strava integration or manual pokes in dojo to
+          retrieve them.
+        </div>
+      }
     </Grid>
   )
 }
