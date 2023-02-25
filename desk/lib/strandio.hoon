@@ -488,7 +488,6 @@
     ~
     ~
   ==
-  ~&  request
   ;<  ~                      bind:m  (send-request request)
   ;<  =client-response:iris  bind:m  take-client-response
   (extract-body client-response)
