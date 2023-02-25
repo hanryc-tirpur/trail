@@ -36,7 +36,7 @@
   ?>  (team:title our.bowl src.bowl)
   ?.  ?=(%trail-action mark)  (on-poke:def mark vase)
   =/  act  !<(action vase)
-  ~&  act
+  ::  ~&  act
   =.  state  (poke-action act)
   `this
   ::
@@ -59,7 +59,7 @@
         (reel segments |=([s=segment sum=distance] (add-km sum distance.s)))
         (reel segments |=([s=segment sum=@] (add sum elapsed-time.s)))
       ==
-      ~&  to-add
+      :: ~&  to-add
       state(activities (~(put by activities) id.act `activity`to-add))
       ::
         %save-outside-activity
@@ -110,7 +110,7 @@
       :^  ~  ~  %trail-update
       !>  ^-  update
       :: [%activities (turn matches |=(a=[@ activity] [id.a total-distance.a total-elapsed-time.a]))]
-      [%activities (sort ~(val by activities) |=([a=activity b=activity] (gth id.a id.b)))]
+      [%activities (scag 10 (sort ~(val by activities) |=([a=activity b=activity] (gth id.a id.b))))]
     ::
         [%before @ @ ~]
       =/  before=@  (rash i.t.t.t.path dem)

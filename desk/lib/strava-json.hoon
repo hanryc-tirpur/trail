@@ -79,6 +79,13 @@
           %-  pairs
           :~  ['isConnected' b+is-connected.update]
       ==  ==
+      %strava-synced
+      %-  pairs
+        :~  ['type' s+'stravaSynced']
+          :-  'payload' 
+          %-  pairs
+          :~  ['until' (numb (unt:chrono:userlib until.update))]
+      ==  ==
   ==
 ++  enjs-api-sync-status
   =,  enjs:format

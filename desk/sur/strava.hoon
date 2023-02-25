@@ -59,6 +59,7 @@
   ==
 +$  strava-update
   $%  [%strava-connected is-connected=?]
+      [%strava-synced until=@da]
   ==
 +$  thread-response
   $%  [%initial-authorization-response auth=refresh-response:oauth2 client-id=@ud client-secret=@t]

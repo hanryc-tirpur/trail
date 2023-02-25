@@ -11,7 +11,6 @@
   =,  enjs:format
   |=  upd=update
   ^-  json
-  ~&  upd
   |^
   ?-    -.upd
       %activities

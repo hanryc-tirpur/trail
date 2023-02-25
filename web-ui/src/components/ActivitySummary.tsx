@@ -15,12 +15,16 @@ import IconButton from '@mui/material/IconButton'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 
+import DirectionsRun from '@mui/icons-material/DirectionsRun'
+import DirectionsWalk from '@mui/icons-material/DirectionsWalk'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import PedalBike from '@mui/icons-material/PedalBike'
+import QuestionMark from '@mui/icons-material/QuestionMark'
 
 
 export type ActivitySummary = {
   id: string,
+  activityType: string,
   mapPolyline: string,
   name: string,
   timeMoving: number,
@@ -40,13 +44,26 @@ export enum DistanceUnit {
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiaGFucnljLXRpcnB1ciIsImEiOiJjbGM5ODJpbTQwa3JpM3FwOGg1ZWJxZzFoIn0.aTFy6FZ_UD6Djp3QBZG6aw'
 
-export default function ActivitySummaryComponent({ id, mapPolyline, name, timeMoving, totalElapsedTime, totalDistance }: ActivitySummary) {
+function getActivityIcon(activityType: string) {
+  switch(activityType) {
+    case 'bike':
+    case 'ride':
+      return <PedalBike />
+    case 'run':
+      return <DirectionsRun />
+    case 'walk':
+      return <DirectionsWalk />
+    default:
+      return <QuestionMark />
+  }
+}
+
+export default function ActivitySummaryComponent({ id, activityType, mapPolyline, name, timeMoving, totalElapsedTime, totalDistance }: ActivitySummary) {
   const mapContainer = useRef<HTMLDivElement | null>(null)
   const map = useRef<Map | null>(null)
   const geo = polyline.toGeoJSON(mapPolyline)
   const box = bbox(geo)
   const cen = center(geo)
-  console.log(box, cen)
   const [lng, setLng] = useState(cen.geometry.coordinates[0])
   const [lat, setLat] = useState(cen.geometry.coordinates[1])
   const [zoom, setZoom] = useState(12)
@@ -137,13 +154,13 @@ export default function ActivitySummaryComponent({ id, mapPolyline, name, timeMo
             <MoreVertIcon />
           </IconButton>
         }
-        title={'~hanryc-tirpur'}
+        title={`~${window.ship}`}
         subheader={startTimeDescription}
       />
       <CardContent style={{ width: '550px', paddingTop: '0' }}>
         <Grid container spacing={2}>
           <Grid item textAlign="center" style={{ width: '40px', marginLeft: '8px', marginRight: '8px', }}>
-            <PedalBike />
+            {getActivityIcon(activityType)}
           </Grid>
           <Grid container item xs={10}>
             <Grid item xs={12}>
