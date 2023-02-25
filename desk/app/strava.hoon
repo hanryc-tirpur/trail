@@ -222,7 +222,7 @@
             :: ~&  [%sync-poke sync-poke]
             :_  this(state state(sync-status (get-next-status sync-status.state action.res)))
             :: (snoc cards [%pass /strava/self/sync %agent [our.bowl %strava] %poke %strava-action !>(sync-poke)])
-            cards
+            (snoc cards [%give %fact ~[/updates] strava-update+!>([%strava-synced now.bowl])])
           ==
         ==
       ==

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Urbit from '@urbit/http-api'
 
 import Button from '@mui/material/Button'
@@ -9,27 +9,14 @@ import SyncIcon from '@mui/icons-material/Sync'
 
 import Title from './Title'
 
-import type { StravaSynced } from '../types/strava-types'
+import type { StravaSynced, StravaUnsynced } from '../types/strava-types'
 import { dateAndTimeStringFromSeconds } from '../../../../util/date-formats'
 import { useConnectionStatus } from '../Strava'
 
 const api = new Urbit('', '', window.desk)
 api.ship = window.ship
 
-
-const syncAll = async () => {
-  const pokeResult = await api.poke({
-    app: 'strava',
-    mark: 'strava-action',
-    json: {
-      'sync-all': {
-        'until': Math.floor(Date.now()),
-      }
-    }
-  })
-}
-
-function Synced({ until }: StravaSynced) {
+function Synced({ until, isSyncing, syncAll }: StravaSynced & { isSyncing: boolean, syncAll: any }) {
   
   return (
     <Stack
@@ -52,7 +39,7 @@ function Synced({ until }: StravaSynced) {
       </div>
 
       <div>
-        <Button variant="contained" endIcon={<SyncIcon />} onClick={syncAll}>
+        <Button variant="contained" endIcon={<SyncIcon />} onClick={syncAll} disabled={isSyncing}>
           Import Latest
         </Button>
       </div>
@@ -66,7 +53,7 @@ function Syncing() {
   )
 }
 
-function Unsynced() {
+function Unsynced({ isSyncing, syncAll }: StravaUnsynced & { isSyncing: boolean, syncAll: any }) {
   return (
     <Stack
       direction="column"
@@ -80,7 +67,7 @@ function Unsynced() {
       </div>
 
       <div>
-      <Button variant="contained" endIcon={<SyncIcon />} onClick={syncAll}>
+      <Button variant="contained" endIcon={<SyncIcon />} onClick={syncAll} disabled={isSyncing}>
         Import Activities
       </Button>
       </div>
@@ -89,15 +76,47 @@ function Unsynced() {
 }
 
 export default function ActivitySync() {
-  const { syncStatus } = useConnectionStatus()
+  const { syncStatus: ss } = useConnectionStatus()
+  const [ syncStatus, setSyncStatus ] = useState(ss)
+  const [ isSyncing, setIsSyncing ] = useState(false)
 
+
+  const syncAll = async () => {
+    setIsSyncing(true)
+
+    api.subscribe({
+      app: 'strava',
+      path: '/updates',
+      event: evt => {
+        if(evt.type !== 'stravaSynced') return
+
+        setIsSyncing(false)
+        setSyncStatus({
+          status: 'synced',
+          until: evt.payload.until,
+        })
+      },
+      err: () => console.log('Could not subscribe to strava app updates'),
+    })
+    api.poke({
+      app: 'strava',
+      mark: 'strava-action',
+      json: {
+        'sync-all': {
+          'until': Math.floor(Date.now()),
+        }
+      }
+    })
+  }
+
+  const args = { isSyncing, syncAll, }
   return (
     <>
       <Title>Activity Sync</Title>
       { syncStatus.status === 'unsynced'
-        ? (<Unsynced />)
+        ? (<Unsynced {... syncStatus} {... args} />)
         : syncStatus.status === 'synced'
-          ? (<Synced {... syncStatus} />)
+          ? (<Synced {... syncStatus} {... args} />)
           : (<Syncing />)
       }
     </>

@@ -196,4 +196,20 @@
     !>  (skip (trip expected-json) remove-whitespace)
     !>  (en-json:html (enjs-update [%strava-connected %.y]))
   ==
+  ::
+  ++  test-enjs-update-strava-synced
+  =/  expected-json
+  '''
+  {
+    "type": "stravaSynced",
+    "payload": {
+      "until": 1676159502
+    }
+  }
+  '''
+  ;:  weld
+  %+  expect-eq
+    !>  (skip (trip expected-json) remove-whitespace)
+    !>  (en-json:html (enjs-update [%strava-synced ~2023.2.11..23.51.42]))
+  ==
 --
