@@ -64,7 +64,6 @@ export default function ActivitySummaryComponent({ id, activityType, mapPolyline
   const geo = polyline.toGeoJSON(mapPolyline)
   const box = bbox(geo)
   const cen = center(geo)
-  console.log(box, cen)
   const [lng, setLng] = useState(cen.geometry.coordinates[0])
   const [lat, setLat] = useState(cen.geometry.coordinates[1])
   const [zoom, setZoom] = useState(12)

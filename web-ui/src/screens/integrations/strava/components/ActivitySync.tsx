@@ -2,6 +2,7 @@ import React from 'react'
 import Urbit from '@urbit/http-api'
 
 import Button from '@mui/material/Button'
+import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import SyncIcon from '@mui/icons-material/Sync'
@@ -31,25 +32,31 @@ const syncAll = async () => {
 function Synced({ until }: StravaSynced) {
   
   return (
-    <div>
-      <Typography> 
-        You are connected to Strava, and have already imported Activities.
-      </Typography>
+    <Stack
+      direction="column"
+      height="100%"
+      spacing={3}
+    >
+      <div style={{ flex: 1 }}>
+        <Typography> 
+          You are connected to Strava, and have already imported Activities.
+        </Typography>
 
-      <Typography display={'inline-block'}> 
-        Latest import:{' '}
-      </Typography>
+        <Typography display={'inline-block'}> 
+          Latest import:
+        </Typography>
 
-      <Typography fontWeight={'bold'} display={'inline-block'}> 
-        {dateAndTimeStringFromSeconds(until)}
-      </Typography>
+        <Typography fontWeight={'bold'} display={'inline-block'}> 
+          {` ${dateAndTimeStringFromSeconds(until)}`}
+        </Typography>
+      </div>
 
       <div>
         <Button variant="contained" endIcon={<SyncIcon />} onClick={syncAll}>
           Import Latest
         </Button>
       </div>
-    </div>
+    </Stack>
   )
 }
 
@@ -61,15 +68,23 @@ function Syncing() {
 
 function Unsynced() {
   return (
-    <div>
-      <Typography> 
-        You have connected to Strava, but you have not yet imported any Activies.
-      </Typography>
+    <Stack
+      direction="column"
+      height="100%"
+      spacing={3}
+    >
+      <div style={{ flex: 1 }}>
+        <Typography> 
+          You have connected to Strava, but you have not yet imported any Activies.
+        </Typography>
+      </div>
 
+      <div>
       <Button variant="contained" endIcon={<SyncIcon />} onClick={syncAll}>
         Import Activities
       </Button>
-    </div>
+      </div>
+    </Stack>
   )
 }
 
