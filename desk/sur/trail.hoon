@@ -9,6 +9,17 @@
   $:  =timestamp
       =location
   ==
++$  tracked-activity
+  $:  =id
+      =activity-type
+      name=tape
+      source=@tas
+      time-active=@dr
+      time-elapsed=@dr
+      total-distance=distance
+      segments=(lest segment)
+      source-data=(unit (cask))
+  == 
 +$  strava-activity
   $:  =id
       =activity-type
@@ -22,7 +33,7 @@
 +$  standard-activity
   $:  =id
       =activity-type
-      segments=(list segment)
+      segments=(lest location-segment)
       total-distance=distance
       total-elapsed-time=@dr
   ==
@@ -30,21 +41,33 @@
   $%
     [%standard standard-activity]
     [%strava strava-activity]
+    [%tracked tracked-activity]
   ==
 +$  activity-summary
   $%  [%standard =id total-distance=distance total-elapsed-time=@dr]
       [%strava strava-activity]
   ==
 +$  segment
+  $%  [%location location-segment]
+      [%polyline polyline-segment]
+  ==
++$  location-segment
   $:  start-time=timestamp
       end-time=timestamp
-      path=(list location-reading)
+      path=(lest location-reading)
+      =distance
+      elapsed-time=@dr
+  ==
++$  polyline-segment
+  $:  start-time=timestamp
+      end-time=timestamp
+      path=(lest tape)
       =distance
       elapsed-time=@dr
   ==
 +$  activities  (map id activity)
 +$  action
-  $%  [%sync-activity =id =activity-type full-path=(list (lest location-reading))]
+  $%  [%sync-activity =id =activity-type full-path=(lest (lest location-reading))]
       [%save-settings unit=distance-unit]
       [%save-outside-activity activity=[%strava strava-activity]]
   ==

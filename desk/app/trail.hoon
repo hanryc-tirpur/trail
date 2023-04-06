@@ -50,14 +50,17 @@
       ?<  (~(has by activities.state) id.act)
       ?~  full-path.act  !!
       :: ~&  (to-segment i.full-path.act)
-      =/  segments=(list segment)  (turn full-path.act to-segment)
+      =/  segments=(list location-segment)  (turn full-path.act to-segment)
+      =/  d  (reel segments |=([s=location-segment sum=distance] (add-km sum distance.s)))
+      =/  et  (reel segments |=([s=location-segment sum=@] (add sum elapsed-time.s)))
+      ?~  segments  !!
       =/  to-add  :*
         %standard
         id.act
         activity-type.act
         segments
-        (reel segments |=([s=segment sum=distance] (add-km sum distance.s)))
-        (reel segments |=([s=segment sum=@] (add sum elapsed-time.s)))
+        d
+        et
       ==
       :: ~&  to-add
       state(activities (~(put by activities) id.act `activity`to-add))
@@ -70,25 +73,27 @@
     ==
     ++  to-segment
       |=  readings=(lest location-reading)
-      ^-  segment
+      ^-  location-segment
       =/  prev  i.readings
       =/  remaining  t.readings
-      =/  seg=segment  :*
+      =/  seg=location-segment  :*
         timestamp.prev
         timestamp.prev
-        `(list location-reading)`~[prev]
+        `(lest location-reading)`~[prev]
         [.~0 %km]
         (mul 0 ~s1)
       ==
       |-
       ?~  remaining  seg
       =/  current  i.remaining
-      =/  updated=segment  :*
+      =/  seg-path  (snoc path.seg current)
+      ?~  seg-path  !!
+      =/  updated=location-segment  :*
         start-time.seg
         timestamp.current
-        (snoc path.seg current)
+        seg-path
         (add-km distance.seg (to-km location.prev location.current))
-        (sub timestamp.current start-time.seg)
+        `@dr`(sub timestamp.current start-time.seg)
       ==
       %=  $
         seg  updated
