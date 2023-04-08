@@ -52,7 +52,7 @@
       :: ~&  (to-segment i.full-path.act)
       =/  segments=(list location-segment)  (turn full-path.act to-segment)
       =/  d  (reel segments |=([s=location-segment sum=distance] (add-km sum distance.s)))
-      =/  et  (reel segments |=([s=location-segment sum=@] (add sum elapsed-time.s)))
+      =/  et  (reel segments |=([s=location-segment sum=@] (add sum time-elapsed.s)))
       ?~  segments  !!
       =/  to-add  :*
         %standard
@@ -70,6 +70,15 @@
       ?<  (~(has by activities.state) id.activity.act)
       ?~  map-polyline.strava  !!
       state(activities (~(put by activities.state) id.strava strava))
+      ::
+        %save-activity
+      ?<  (~(has by activities.state) id.activity.act)
+      ?-  -.activity.act
+          %strava  !!
+          %standard  !!
+          %tracked
+        state(activities (~(put by activities.state) id.activity.act activity.act))
+      ==
     ==
     ++  to-segment
       |=  readings=(lest location-reading)

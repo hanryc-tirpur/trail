@@ -11,11 +11,10 @@
   =,  enjs:format
   |=  upd=update
   ^-  json
-  |^
   ?-    -.upd
       %activities
     %-  pairs
-    :~  ['activities' a+(turn list.upd entry)]
+    :~  ['activities' a+(turn list.upd enjs-activity)]
     ==
   ::
       %activity
@@ -24,7 +23,8 @@
         ['logs' s+'hi']
     ==
   ==
-  ++  entry
+  ++  enjs-activity
+    =,  enjs:format
     |=  a=activity
     ^-  json
     ?-    -.a
@@ -51,6 +51,49 @@
           :~  ['val' (numb-rd val.total-distance.a)]
               ['unit' s+unit.total-distance.a]
       ==  ==
+      ::       =activity-type
+      :: name=tape
+      :: time-active=@dr
+      :: time-elapsed=@dr
+      :: total-distance=distance
+      :: segments=(lest segment)
+        %tracked
+      %-  pairs
+      :~  ['id' (numb (unm:chrono:userlib id.a))]
+          ['activityType' s+activity-type.a]
+          ['name' (tape name.a)]
+          ['timeActive' (numb (div time-active.a ~s1))]
+          ['timeElapsed' (numb (div time-elapsed.a ~s1))]
+          ['segments' a+(turn segments.a enjs-segment)]
+          ['totalDistance' (enjs-distance total-distance.a)]
+      ==
+        :: $:  start-time=timestamp
+    ::   end-time=timestamp
+    ::   path=(lest tape)
+    ::   =distance
+    ::   elapsed-time=@dr
+    ==
+  ++  enjs-segment
+    =,  enjs:format
+    |=  seg=segment
+    ^-  json
+    ?-  -.seg
+        %location  !!
+        %polyline
+      %-  pairs
+      :~  ['startTime' (numb (unm:chrono:userlib start-time.seg))]
+          ['endTime' (numb (unm:chrono:userlib end-time.seg))]
+          ['timeElapsed' (numb (div time-elapsed.seg ~s1))]
+          ['distance' (enjs-distance distance.seg)]
+          ['path' a+(turn path.seg tape)]
+    ==  ==
+  ++  enjs-distance
+    =,  enjs:format
+    |=  d=distance
+    ^-  json
+    %-  pairs
+    :~  ['val' (numb-rd val.d)]
+        ['unit' s+unit.d]
     ==
   ++  numb-rd
     |=  a=@rd
@@ -83,5 +126,4 @@
     |=  a=@u
     (crip (u-to-tape a))
 
-  --
 --

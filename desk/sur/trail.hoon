@@ -13,13 +13,22 @@
   $:  =id
       =activity-type
       name=tape
-      source=@tas
       time-active=@dr
       time-elapsed=@dr
       total-distance=distance
       segments=(lest segment)
-      source-data=(unit (cask))
   == 
+:: +$  tracked-external-activity
+::   $:  =id
+::       =activity-type
+::       name=tape
+::       source=@tas
+::       time-active=@dr
+::       time-elapsed=@dr
+::       total-distance=distance
+::       segments=(lest segment)
+::       source-data=(unit (cask))
+::   == 
 +$  strava-activity
   $:  =id
       =activity-type
@@ -44,7 +53,7 @@
     [%tracked tracked-activity]
   ==
 +$  activity-summary
-  $%  [%standard =id total-distance=distance total-elapsed-time=@dr]
+  $%  [%standard =id =activity-type total-distance=distance total-elapsed-time=@dr]
       [%strava strava-activity]
   ==
 +$  segment
@@ -56,20 +65,21 @@
       end-time=timestamp
       path=(lest location-reading)
       =distance
-      elapsed-time=@dr
+      time-elapsed=@dr
   ==
 +$  polyline-segment
   $:  start-time=timestamp
       end-time=timestamp
       path=(lest tape)
       =distance
-      elapsed-time=@dr
+      time-elapsed=@dr
   ==
 +$  activities  (map id activity)
 +$  action
   $%  [%sync-activity =id =activity-type full-path=(lest (lest location-reading))]
       [%save-settings unit=distance-unit]
       [%save-outside-activity activity=[%strava strava-activity]]
+      [%save-activity =activity]
   ==
 +$  update
   $%  [%activities list=(list activity)]
