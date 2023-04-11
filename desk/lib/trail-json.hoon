@@ -85,7 +85,7 @@
           ['endTime' (numb (unm:chrono:userlib end-time.seg))]
           ['timeElapsed' (numb (div time-elapsed.seg ~s1))]
           ['distance' (enjs-distance distance.seg)]
-          ['path' a+(turn path.seg tape)]
+          ['path' (tape path.seg)]
     ==  ==
   ++  enjs-distance
     =,  enjs:format
@@ -126,4 +126,93 @@
     |=  a=@u
     (crip (u-to-tape a))
 
+  ++  dejs-activity
+    =,  dejs:format
+    |=  jon=json
+    |^  ^-  a-activity
+    (to-activity jon)
+    ++  to-activity
+      %-  of
+      :~  standard+to-id
+          strava+to-id
+          tracked+to-tracked
+      ==
+    ++  to-id
+      %-  ot
+      :~  id+di
+      ==
+    ++  to-tracked
+      %-  ot
+      :~  id+di
+          ['activityType' s-at]
+          name+sa
+          ['timeActive' n-dr]
+          ['timeElapsed' n-dr]
+          ['totalDistance' to-distance]
+          segments+(a-lest to-segment)
+      ==
+    ++  to-distance
+      %-  ot
+      :~  val+ne
+          unit+s-du
+      ==
+    ++  to-segment
+      %-  of
+      :~  location+to-location-segment
+          polyline+to-polyline-segment
+      ==
+    ++  to-location-segment
+      %-  ot
+      :~  ['startTime' di]
+          ['endTime' di]
+          path+(a-lest to-location-reading)
+          distance+to-distance
+          ['timeElapsed' n-dr]
+      ==
+    ++  to-location-reading
+      %-  ot
+      :~  timestamp+di
+          location+to-location
+      ==
+    ++  to-location
+      %-  ot
+      :~  lat+to-angle
+          long+to-angle
+      ==
+    ++  to-polyline-segment
+      %-  ot
+      :~  ['startTime' di]
+          ['endTime' di]
+          path+sa
+          distance+to-distance
+          ['timeElapsed' n-dr]
+      ==
+    ++  to-angle
+      %-  ot
+      :~  val+ne
+          unit+s-au
+      ==
+    ++  s-at
+      (cu (extract *activity-type) so)
+    ++  s-du
+      (cu (extract *distance-unit) so)
+    ++  s-au
+      (cu (extract *angular-unit) so)
+    ++  n-dr
+      (cu to-dr ni)
+    ++  to-dr
+      |=  a=@ud
+      (mul ~s1 a)
+    ++  extract
+      |*  a=*
+      |=  b=@t
+      !<(_a [-:!>(a) b])
+    ++  a-lest
+      |*  wit=fist
+      |=  jon=json  ^-  (lest _(wit *json))
+      ?>  ?=([%a *] jon)
+      =/  res  (turn p.jon wit)
+      ?~  res  !!
+      res
+    --
 --

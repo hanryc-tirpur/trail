@@ -28,7 +28,7 @@
 ::     !>  (skip (trip expected-json) remove-whitespace)
 ::     !>  (en-json:html (enjs-update [%activities `(list activity)`~[summary-1]]))
 ::   ==
-++  test-enjs-activity-for-tracked-activity
+++  test-enjs-activity-for-tracked-activity-with-polyline
   =/  expected-json
   '''
   {
@@ -40,9 +40,7 @@
         "val": 4.9455646421625,
         "unit": "mile"
       },
-      "path": [
-        "thisshouldbeapolyline"
-      ],
+      "path": "thisshouldbeapolyline",
       "timeElapsed": 945,
       "startTime": 1680861222000,
       "endTime": 1680861222000
@@ -55,26 +53,14 @@
     "timeElapsed": 1107
   }
   '''
-    :: $:  start-time=timestamp
-    ::   end-time=timestamp
-    ::   path=(lest tape)
-    ::   =distance
-    ::   elapsed-time=@dr
   =/  segment-to-enjs  :*
     %polyline
     ~2023.4.7..9.53.42 
     ~2023.4.7..9.53.42 
-    ~["thisshouldbeapolyline"]
+    "thisshouldbeapolyline"
     [.~4.945564642162535 %mile]
     (mul ~s1 945)
   ==
-      :: =id
-      :: =activity-type
-      :: name=tape
-      :: time-active=@dr
-      :: time-elapsed=@dr
-      :: total-distance=distance
-      :: segments=(lest segment)
   =/  activity-to-enjs  :*
     %tracked
     ~2023.4.7..9.53.42 
@@ -90,6 +76,112 @@
     !>  (skip (trip expected-json) remove-whitespace)
     !>  (en-json:html (enjs-activity activity-to-enjs))
   ==
+++  test-dejs-activity-for-tracked-activity-with-polyline
+  =/  activity-json  %-  need  %-  de-json:html
+  '''
+  {
+    "tracked": {
+      "activityType": "run",
+      "name": "Morningrun",
+      "timeActive": 945,
+      "segments": [{
+        "polyline": {
+          "distance": {
+            "val": 4.9455646421625,
+            "unit": "mile"
+          },
+          "path": "thisshouldbeapolyline",
+          "timeElapsed": 945,
+          "startTime": 1680861222000,
+          "endTime": 1680861222000
+        }
+      }],
+      "id": 1680861222000,
+      "totalDistance": {
+        "val": 4.9455646421625,
+        "unit": "mile"
+      },
+      "timeElapsed": 1107
+    }
+  }
+  '''
+  =/  expected-segment  :*
+    %polyline
+    ~2023.4.7..9.53.42 
+    ~2023.4.7..9.53.42 
+    "thisshouldbeapolyline"
+    [.~4.9455646421625 %mile]
+    `@dr`(mul ~s1 945)
+  ==
+  =/  expected-activity  :*
+    %tracked
+    ~2023.4.7..9.53.42
+    %run
+    "Morningrun"
+    `@dr`(mul ~s1 945)
+    `@dr`(mul ~s1 1.107)
+    [.~4.9455646421625 %mile]
+    `(lest segment)`~[expected-segment]
+  ==
+  ;:  weld
+  %+  expect-eq
+    !>  expected-activity
+    !>  (dejs-activity activity-json)
+  ==
+:: ++  test-dejs-activity-for-tracked-activity
+::   =/  activity-json  %-  need  %-  de-json:html
+::   '''
+::   {
+::     "tracked": {
+::       "activityType": "run",
+::       "name": "Morningrun",
+::       "timeActive": 945,
+::       "segments": [{
+::         "location": {
+::           "distance": {
+::             "val": 4.9455646421625,
+::             "unit": "mile"
+::           },
+::           "path": [
+::             "thisshouldbeapolyline"
+::           ],
+::           "timeElapsed": 945,
+::           "startTime": 1680861222000,
+::           "endTime": 1680861222000
+::         }
+::       }],
+::       "id": 1680861222000,
+::       "totalDistance": {
+::         "val": 4.9455646421625,
+::         "unit": "mile"
+::       },
+::       "timeElapsed": 1107
+::     }
+::   }
+::   '''
+::   =/  expected-segment  :*
+::     %polyline
+::     ~2023.4.7..9.53.42 
+::     ~2023.4.7..9.53.42 
+::     "thisshouldbeapolyline"
+::     [.~4.9455646421625 %mile]
+::     `@dr`(mul ~s1 945)
+::   ==
+::   =/  expected-activity  :*
+::     %tracked
+::     ~2023.4.7..9.53.42
+::     %run
+::     "Morningrun"
+::     `@dr`(mul ~s1 945)
+::     `@dr`(mul ~s1 1.107)
+::     [.~4.9455646421625 %mile]
+::     `(lest segment)`~[expected-segment]
+::   ==
+::   ;:  weld
+::   %+  expect-eq
+::     !>  expected-activity
+::     !>  (dejs-activity activity-json)
+::   ==
 ++  test-u-to-tape
   ;:  weld
   %+  expect-eq
