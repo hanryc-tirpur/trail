@@ -2,7 +2,7 @@
 
 |%
 +$  id  @da
-+$  activity-type  ?(%bike %walk %run %ride %crossfit)
++$  activity-type  ?(%walk %run %ride)
 +$  settings  [unit=distance-unit]
 +$  timestamp  @da
 +$  location-reading
@@ -76,7 +76,8 @@
   ==
 +$  activities  (map id activity)
 +$  action
-  $%  [%sync-activity =id =activity-type full-path=(lest (lest location-reading))]
+  $%  
+  :: [%sync-activity =id =activity-type full-path=(lest (lest location-reading))]
       [%save-settings unit=distance-unit]
       [%save-outside-activity activity=[%strava strava-activity]]
       [%save-activity =activity]
@@ -85,26 +86,4 @@
   $%  [%activities list=(list activity)]
       [%activity =activity]
   ==
-
-+$  a-activity
-  $%
-    [%standard s-a]
-    [%strava v-a]
-    [%tracked t-a]
-  ==
-+$  s-a
-  $:  =id
-  == 
-+$  v-a
-  $:  =id
-  == 
-+$  t-a
-  $:  =id
-      =activity-type
-      name=tape
-      time-active=@dr
-      time-elapsed=@dr
-      total-distance=distance
-      segments=(lest segment)
-  == 
 --

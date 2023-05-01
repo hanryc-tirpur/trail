@@ -126,93 +126,157 @@
     |=  a=@u
     (crip (u-to-tape a))
 
+  ++  dejs-action
+    =,  dejs:format
+    |=  jon=json
+    ^-  action
+    (to-action jon)
+  ++  to-action
+    =,  dejs:format
+    %-  of
+    :~  save-activity+to-activity
+        save-settings+s-du
+        save-outside-activity+to-outside-activity
+    ==
+  ++  to-standard-bare
+    =,  dejs:format
+    %-  of
+    :~  id+di
+        ['activityType' s-at]
+        ['fullPath' (a-lest (a-lest to-location-reading))]
+    ==
+  ++  to-full-path-segment
+    =,  dejs:format
+    %-  ot
+    :~  ['startTime' di]
+        ['endTime' di]
+        path+(a-lest to-location-reading)
+        distance+to-distance
+        ['timeElapsed' n-dr]
+    ==
+  ++  to-outside-activity
+    =,  dejs:format
+    %-  of
+    :~  strava+to-strava
+    ==
   ++  dejs-activity
     =,  dejs:format
     |=  jon=json
-    |^  ^-  a-activity
+    ^-  activity
     (to-activity jon)
-    ++  to-activity
-      %-  of
-      :~  standard+to-id
-          strava+to-id
-          tracked+to-tracked
-      ==
-    ++  to-id
-      %-  ot
-      :~  id+di
-      ==
-    ++  to-tracked
-      %-  ot
-      :~  id+di
-          ['activityType' s-at]
-          name+sa
-          ['timeActive' n-dr]
-          ['timeElapsed' n-dr]
-          ['totalDistance' to-distance]
-          segments+(a-lest to-segment)
-      ==
-    ++  to-distance
-      %-  ot
-      :~  val+ne
-          unit+s-du
-      ==
-    ++  to-segment
-      %-  of
-      :~  location+to-location-segment
-          polyline+to-polyline-segment
-      ==
-    ++  to-location-segment
-      %-  ot
-      :~  ['startTime' di]
-          ['endTime' di]
-          path+(a-lest to-location-reading)
-          distance+to-distance
-          ['timeElapsed' n-dr]
-      ==
-    ++  to-location-reading
-      %-  ot
-      :~  timestamp+di
-          location+to-location
-      ==
-    ++  to-location
-      %-  ot
-      :~  lat+to-angle
-          long+to-angle
-      ==
-    ++  to-polyline-segment
-      %-  ot
-      :~  ['startTime' di]
-          ['endTime' di]
-          path+sa
-          distance+to-distance
-          ['timeElapsed' n-dr]
-      ==
-    ++  to-angle
-      %-  ot
-      :~  val+ne
-          unit+s-au
-      ==
-    ++  s-at
-      (cu (extract *activity-type) so)
-    ++  s-du
-      (cu (extract *distance-unit) so)
-    ++  s-au
-      (cu (extract *angular-unit) so)
-    ++  n-dr
-      (cu to-dr ni)
-    ++  to-dr
-      |=  a=@ud
-      (mul ~s1 a)
-    ++  extract
-      |*  a=*
-      |=  b=@t
-      !<(_a [-:!>(a) b])
-    ++  a-lest
-      |*  wit=fist
-      |=  jon=json  ^-  (lest _(wit *json))
-      ?>  ?=([%a *] jon)
-      =/  res  (turn p.jon wit)
-      ?~  res  !!
-      res
-    --
+  ++  to-activity
+    =,  dejs:format
+    %-  of
+    :~  standard+to-standard
+        strava+to-strava
+        tracked+to-tracked
+    ==
+  ++  to-tracked
+    =,  dejs:format
+    %-  ot
+    :~  id+di
+        ['activityType' s-at]
+        name+sa
+        ['timeActive' n-dr]
+        ['timeElapsed' n-dr]
+        ['totalDistance' to-distance]
+        segments+(a-lest to-segment)
+    ==
+  ++  to-standard
+    =,  dejs:format
+    %-  ot
+    :~  id+di
+        ['activityType' s-at]
+        segments+(a-lest to-location-segment)
+        ['totalDistance' to-distance]
+        ['totalElapsedTime' n-dr]
+    ==
+  ++  to-strava
+    =,  dejs:format
+    %-  ot
+    :~  id+di
+        ['activityType' s-at]
+        name+sa
+        ['totalDistance' to-distance]
+        ['timeMoving' n-dr]
+        ['timeElapsed' n-dr]
+        ['mapPolyline' sa]
+        ['stravaActivityId' ni]
+    ==
+  ++  to-distance
+    =,  dejs:format
+    %-  ot
+    :~  val+ne
+        unit+s-du
+    ==
+  ++  to-segment
+    =,  dejs:format
+    %-  of
+    :~  location+to-location-segment
+        polyline+to-polyline-segment
+    ==
+  ++  to-location-segment
+    =,  dejs:format
+    %-  ot
+    :~  ['startTime' di]
+        ['endTime' di]
+        path+(a-lest to-location-reading)
+        distance+to-distance
+        ['timeElapsed' n-dr]
+    ==
+  ++  to-location-reading
+    =,  dejs:format
+    %-  ot
+    :~  timestamp+di
+        location+to-location
+    ==
+  ++  to-location
+    =,  dejs:format
+    %-  ot
+    :~  lat+to-angle
+        long+to-angle
+    ==
+  ++  to-polyline-segment
+    =,  dejs:format
+    %-  ot
+    :~  ['startTime' di]
+        ['endTime' di]
+        path+sa
+        distance+to-distance
+        ['timeElapsed' n-dr]
+    ==
+  ++  to-angle
+    =,  dejs:format
+    %-  ot
+    :~  val+ne
+        unit+s-au
+    ==
+  ++  s-at
+    =,  dejs:format
+    (cu (extract *activity-type) so)
+  ++  s-du
+    =,  dejs:format
+    (cu (extract *distance-unit) so)
+  ++  s-au
+    =,  dejs:format
+    (cu (extract *angular-unit) so)
+  ++  n-dr
+    =,  dejs:format
+    (cu to-dr ni)
+  ++  to-dr
+    =,  dejs:format
+    |=  a=@ud
+    (mul ~s1 a)
+  ++  extract
+    |*  a=*
+    |=  b=@t
+    !<(_a [-:!>(a) b])
+  ++  a-lest
+    =,  dejs:format
+    |*  wit=fist
+    |=  jon=json  ^-  (lest _(wit *json))
+    ?>  ?=([%a *] jon)
+    =/  res  (turn p.jon wit)
+    ?~  res  !!
+    res
 --

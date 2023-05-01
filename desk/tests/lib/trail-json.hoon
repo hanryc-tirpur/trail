@@ -128,6 +128,60 @@
     !>  expected-activity
     !>  (dejs-activity activity-json)
   ==
+++  test-dejs-action-for-save-action-with-tracked-activity-with-polyline
+  =/  activity-json  %-  need  %-  de-json:html
+  '''
+  {
+    "save-activity": {
+    "tracked": {
+      "activityType": "run",
+      "name": "Morningrun",
+      "timeActive": 945,
+      "segments": [{
+        "polyline": {
+          "distance": {
+            "val": 4.9455646421625,
+            "unit": "mile"
+          },
+          "path": "thisshouldbeapolyline",
+          "timeElapsed": 945,
+          "startTime": 1680861222000,
+          "endTime": 1680861222000
+        }
+      }],
+      "id": 1680861222000,
+      "totalDistance": {
+        "val": 4.9455646421625,
+        "unit": "mile"
+      },
+      "timeElapsed": 1107
+    }
+    }
+  }
+  '''
+  =/  expected-segment  :*
+    %polyline
+    ~2023.4.7..9.53.42 
+    ~2023.4.7..9.53.42 
+    "thisshouldbeapolyline"
+    [.~4.9455646421625 %mile]
+    `@dr`(mul ~s1 945)
+  ==
+  =/  expected-activity  :*
+    %tracked
+    ~2023.4.7..9.53.42
+    %run
+    "Morningrun"
+    `@dr`(mul ~s1 945)
+    `@dr`(mul ~s1 1.107)
+    [.~4.9455646421625 %mile]
+    `(lest segment)`~[expected-segment]
+  ==
+  ;:  weld
+  %+  expect-eq
+    !>  [%save-activity expected-activity]
+    !>  (dejs-action activity-json)
+  ==
 :: ++  test-dejs-activity-for-tracked-activity
 ::   =/  activity-json  %-  need  %-  de-json:html
 ::   '''

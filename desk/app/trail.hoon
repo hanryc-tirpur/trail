@@ -46,24 +46,24 @@
     ?-    -.act
         %save-settings
       state(settings [unit.act])
-        %sync-activity
-      ?<  (~(has by activities.state) id.act)
-      ?~  full-path.act  !!
-      :: ~&  (to-segment i.full-path.act)
-      =/  segments=(list location-segment)  (turn full-path.act to-segment)
-      =/  d  (reel segments |=([s=location-segment sum=distance] (add-km sum distance.s)))
-      =/  et  (reel segments |=([s=location-segment sum=@] (add sum time-elapsed.s)))
-      ?~  segments  !!
-      =/  to-add  :*
-        %standard
-        id.act
-        activity-type.act
-        segments
-        d
-        et
-      ==
-      :: ~&  to-add
-      state(activities (~(put by activities) id.act `activity`to-add))
+      ::   %sync-activity
+      :: ?<  (~(has by activities.state) id.act)
+      :: ?~  full-path.act  !!
+      :: :: ~&  (to-segment i.full-path.act)
+      :: =/  segments=(list location-segment)  (turn full-path.act to-segment)
+      :: =/  d  (reel segments |=([s=location-segment sum=distance] (add-km sum distance.s)))
+      :: =/  et  (reel segments |=([s=location-segment sum=@] (add sum time-elapsed.s)))
+      :: ?~  segments  !!
+      :: =/  to-add  :*
+      ::   %standard
+      ::   id.act
+      ::   activity-type.act
+      ::   segments
+      ::   d
+      ::   et
+      :: ==
+      :: :: ~&  to-add
+      :: state(activities (~(put by activities) id.act `activity`to-add))
       ::
         %save-outside-activity
       =/  strava  activity.act
