@@ -2,8 +2,8 @@
     info+'An activity tracker for Urbit'
     color+0x2e.4347
     base+'trail'
-    glob-ames+[~hillep-nosnyr-hanryc-tirpur 0v0]
-    version+[0 1 0]
+    glob-ames+[~modlyx-hidled-hanryc-tirpur 0v0]
+    version+[0 6 0]
     website+'https://github.com/hanryc-tirpur/trail'
     license+'MIT'
 ==
