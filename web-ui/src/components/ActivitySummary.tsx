@@ -22,13 +22,17 @@ import PedalBike from '@mui/icons-material/PedalBike'
 import QuestionMark from '@mui/icons-material/QuestionMark'
 
 
+export type Segment = {
+  path: string,
+}
+
 export type ActivitySummary = {
   id: string,
   activityType: string,
-  mapPolyline: string,
+  segments: Segment[],
   name: string,
-  timeMoving: number,
-  totalElapsedTime: number,
+  timeActive: number,
+  timeElapsed: number,
   totalDistance: Distance,
 }
 
@@ -58,10 +62,15 @@ function getActivityIcon(activityType: string) {
   }
 }
 
-export default function ActivitySummaryComponent({ id, activityType, mapPolyline, name, timeMoving, totalElapsedTime, totalDistance }: ActivitySummary) {
+export default function ActivitySummaryComponent({ id, activityType, segments, name, timeActive, timeElapsed, totalDistance }: ActivitySummary) {
   const mapContainer = useRef<HTMLDivElement | null>(null)
   const map = useRef<Map | null>(null)
-  const geo = polyline.toGeoJSON(mapPolyline)
+  const geos = segments.map((seg: Segment) => polyline.toGeoJSON(seg.path))
+  const [first, ...rest] = geos
+  const geo = rest.reduce((combined, g) => {
+    combined.coordinates = combined.coordinates.concat(g.coordinates)
+    return combined
+  }, first)
   const box = bbox(geo)
   const cen = center(geo)
   const [lng, setLng] = useState(cen.geometry.coordinates[0])
@@ -130,16 +139,16 @@ export default function ActivitySummaryComponent({ id, activityType, mapPolyline
   const startTime = DateTime.fromMillis(parseInt(id, 10))
   const startTimeDescription = `${startTime.toLocaleString(DateTime.DATE_FULL)} at ${startTime.toLocaleString(DateTime.TIME_SIMPLE)}`
 
-  let remainingTimeMoving = timeMoving
-  const hours = Math.floor(remainingTimeMoving / 3600)
-  remainingTimeMoving -= (hours * 3600)
-  const minutes = Math.floor(remainingTimeMoving / 60)
-  const seconds = remainingTimeMoving - (minutes * 60)
+  let remainingtimeActive = timeElapsed / 1000
+  const hours = Math.floor(remainingtimeActive / 3600)
+  remainingtimeActive -= (hours * 3600)
+  const minutes = Math.floor(remainingtimeActive / 60)
+  const seconds = Math.floor(remainingtimeActive - (minutes * 60))
 
-  let timeMovingDescription = hours > 0 ? `${hours}h ` : ``
-  timeMovingDescription = timeMovingDescription.length > 0 || minutes > 0
-    ? `${timeMovingDescription}${minutes}m ` : ``
-  timeMovingDescription = `${timeMovingDescription}${seconds}s`
+  let timeActiveDescription = hours > 0 ? `${hours}h ` : ``
+  timeActiveDescription = timeActiveDescription.length > 0 || minutes > 0
+    ? `${timeActiveDescription}${minutes}m ` : ``
+  timeActiveDescription = `${timeActiveDescription}${seconds}s`
 
   return (
     <Card>
@@ -190,7 +199,7 @@ export default function ActivitySummaryComponent({ id, activityType, mapPolyline
               {'n/a'}
             </Grid>
             <Grid item xs={6}>
-              {timeMovingDescription}
+              {timeActiveDescription}
             </Grid>
           </Grid>
         </Grid>

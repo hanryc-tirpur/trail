@@ -30,7 +30,8 @@ export interface ChargeUpdateDel {
 
 export async function loader(): Promise<ActivitySummariesInitial> {
   const scryAllActivities: Scry = { app: 'trail', path: '/activities/all', }
-  const summariesResponse = (await api.scry<ActivitySummariesInitial>(scryAllActivities));
+  const summariesResponse = (await api.scry<ActivitySummariesInitial>(scryAllActivities))
+  console.log(summariesResponse)
   return { ...summariesResponse }
 }
 
@@ -51,6 +52,8 @@ function HasActivities({ activities }: { activities: ActivitySummary[]}) {
 export default function Dashboard() {
   // @ts-ignore ts is kinda annoying
   const { activities } = useLoaderData()
+
+  console.log(activities)
 
   return (
     <Grid container spacing={3}>
